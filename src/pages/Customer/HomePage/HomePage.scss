@@ -1,0 +1,82 @@
+$primary-color: #ff6347; // Màu chính
+
+.container {
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+  color: #333;
+
+  .header {
+    background-color: $primary-color;
+    color: white;
+    padding: 20px;
+    text-align: center;
+
+    .follow-us {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  }
+
+  .sidebar {
+    width: 200px;
+    background: #f4f4f4;
+    padding: 15px;
+    border-right: 1px solid #ddd;
+
+    h2 {
+      font-size: 18px;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+
+      li {
+        padding: 10px 0;
+      }
+    }
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 20px;
+
+    .image-section {
+      img {
+        width: 100%;
+        height: auto;
+      }
+      p {
+        font-style: italic;
+      }
+    }
+
+    .explore-section {
+      margin-top: 20px;
+      h2 {
+        font-size: 24px;
+      }
+    }
+  }
+
+  .footer {
+    background: #f4f4f4;
+    padding: 15px;
+    text-align: center;
+
+    address {
+      margin: 10px 0;
+
+      p {
+        margin: 5px 0;
+      }
+    }
+
+    .about {
+      h3 {
+        font-size: 18px;
+      }
+    }
+  }
+}

@@ -1,26 +1,23 @@
-.register {
+.login {
   width: 300px;
   margin: 0 auto;
-  padding: 2em;
+  padding: 10px 20px; /* match padding with header and footer */
+  background-color: #fff; /* match background color with header and footer */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-
   h2 {
     text-align: center;
     margin-bottom: 1em;
   }
-
   form {
     display: flex;
     flex-direction: column;
-
     input {
       margin-bottom: 1em;
       padding: 0.5em;
       border: 1px solid #ddd;
       border-radius: 4px;
     }
-
     button {
       padding: 0.5em;
       background-color: #007bff;
@@ -30,11 +27,13 @@
       cursor: pointer;
     }
   }
-
-  a {
+  button {
     margin-top: 1em;
-    display: inline-block;
+    padding: 0.5em;
+    background-color: transparent;
     color: #007bff;
-    text-decoration: none;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    cursor: pointer;
   }
 }
