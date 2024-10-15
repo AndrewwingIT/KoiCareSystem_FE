@@ -4,12 +4,10 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { fab } from "@fortawesome/free-brands-svg-icons";
 
-// Import các component
 import Header from "./components/HeaderFolder/Header";
 import Homepage from "./pages/Customer/HomePage/HomePage";
 import LoginForm from "./pages/shared/LoginAccount/login";
 
-// Thêm các biểu tượng vào thư viện
 library.add(fas, fab);
 
 function App() {
