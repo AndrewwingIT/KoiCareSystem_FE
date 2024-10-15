@@ -9,7 +9,7 @@ const Header = () => {
           <img src="/path-to-your-logo.png" alt="KoiCare" />
         </div>
         <div className="header__icons">
-          <a href="#" className="header__icon">
+          {/* <a href="#" className="header__icon">
             <img src="/path-to-facebook-icon.png" alt="Facebook" />
           </a>
           <a href="#" className="header__icon">
@@ -23,13 +23,13 @@ const Header = () => {
           </a>
           <a href="#" className="header__icon">
             <img src="/path-to-account-icon.png" alt="Account" />
-          </a>
+          </a> */}
         </div>
       </div>
 
       <nav className="header__nav">
         <ul className="header__menu">
-          <li>
+          {/* <li>
             <a href="/">Home</a>
           </li>
           <li>
@@ -40,12 +40,12 @@ const Header = () => {
           </li>
           <li>
             <a href="/contact">Contact</a>
-          </li>
+          </li> */}
         </ul>
         <div className="header__lang">
-          <span className="header__lang-flag">
+          {/* <span className="header__lang-flag">
             <img src="/path-to-vietnamese-flag.png" alt="Vietnamese" />
-          </span>
+          </span> */}
         </div>
       </nav>
     </header>

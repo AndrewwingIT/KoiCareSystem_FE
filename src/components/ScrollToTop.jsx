@@ -15,4 +15,5 @@ function ScrollToTop() {
 ScrollToTop.propTypes = {
   location: PropTypes.object.isRequired,
 };
+
 export default ScrollToTop;
