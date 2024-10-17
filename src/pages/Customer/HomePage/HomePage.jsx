@@ -1,6 +1,6 @@
-// KoiCareSystem_FE-master/src/pages/Customer/HomePage/HomePage.jsx
-// import React from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import logo from "../../../assets/images/image.png";
 import "./Homepage.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -28,11 +28,7 @@ const Homepage = () => {
             <FontAwesomeIcon icon={["fab", "whatsapp"]} />
             <FontAwesomeIcon icon={["fab", "line"]} />
           </div>
-          <img
-            src="https://storage.googleapis.com/a1aa/image/LcUxCJJ7Y2ahCNl58MScfvgBAO6EIuuus0rN5QtsxfpUxeLnA.jpg"
-            alt="Koi fish logo"
-            className="logo"
-          />
+          <img src={logo} alt="Koi fish logo" className="logo" />
         </div>
       </header>
 

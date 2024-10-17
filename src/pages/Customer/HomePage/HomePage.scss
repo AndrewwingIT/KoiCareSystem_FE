@@ -1,14 +1,19 @@
-// KoiCareSystem_FE-master/src/pages/Customer/HomePage/HomePage.scss
-body {
-  font-family: Arial, sans-serif;
+html, body {
+  height: 100%;
   margin: 0;
   padding: 0;
+  overflow-y: auto;
+}
+
+body {
+  font-family: Arial, sans-serif;
   background-color: #f4f4f4;
 }
 
 .homepage {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .header {
@@ -54,21 +59,6 @@ body {
     font-size: 24px;
     font-weight: bold;
   }
-
-  .navbar-icons {
-    display: flex;
-    align-items: center;
-
-    i {
-      margin-left: 20px;
-    }
-
-    .flag {
-      width: 30px;
-      height: auto;
-      margin-left: 20px;
-    }
-  }
 }
 
 .main-content {
@@ -76,12 +66,15 @@ body {
   flex-wrap: wrap;
   padding: 20px;
   background-color: #f0f0f0;
+  flex: 1;
+  overflow-y: auto;
 
   .sidebar {
     flex: 1;
     max-width: 300px;
     background-color: #fff;
     padding: 20px;
+    overflow-y: auto;
 
     h2 {
       font-size: 20px;
@@ -93,6 +86,7 @@ body {
 
       li {
         margin-bottom: 10px;
+
         i {
           margin-right: 10px;
         }
@@ -103,6 +97,7 @@ body {
   .main-section {
     flex: 2;
     padding: 20px;
+    overflow-y: auto;
 
     .main-image {
       width: 100%;
