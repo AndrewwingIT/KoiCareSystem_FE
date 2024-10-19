@@ -121,3 +121,47 @@
   left: 50%;
   transform: translateX(-50%);
 }
+
+.error-message-pw {
+  color: red;
+  font-size: 0.9em;
+  margin-top: -10px;
+  margin-left: -90px;
+}
+
+.error-message-email {
+  color: red;
+  font-size: 0.9em;
+  margin: 0px 0px 0px -90px;
+}
+
+input.error {
+  border: 2px solid red;   /* Thicker red border */
+  background-color: #ffe6e6; /* Light red background for invalid input */
+  outline: none;            /* Removes default outline */
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 1em;
+}
+
+button[type="submit"] {
+  padding: 10px 20px;
+  background-color: #ff6600;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+button[type="submit"]:hover {
+  background-color: #ff4500; /* Darken the button on hover */
+}
+
+
