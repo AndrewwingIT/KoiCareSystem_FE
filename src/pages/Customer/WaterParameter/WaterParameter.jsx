@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./WaterParameter.scss";
+import { Form, Input, Modal, Button } from "antd";
 import { FaPlus } from "react-icons/fa";
-import { Form, Input, Modal } from "antd";
-import { getAllPonds } from "../../../services/pondService";
 
 export default function WaterParameter() {
   const [parameters, setParameters] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingParameter, setEditingParameter] = useState(null);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     // Giả lập dữ liệu, sau này sẽ thay bằng API call thực tế
@@ -23,6 +25,8 @@ export default function WaterParameter() {
         hardness: 10,
         nitrite: 10,
         ammonium: 10,
+        co2: 10,
+        totalChlorines: 10,
         outdoorTemp: 10,
         amountFed: 10,
         description: "test",
@@ -63,17 +67,43 @@ export default function WaterParameter() {
     setParameters(fakeData);
   }, []);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const showModal = () => {
+  const showModal = (parameter = null) => {
+    setEditingParameter(parameter);
     setIsModalOpen(true);
-  };
-
-  const handleAdd = () => {
-    showModal();
+    if (parameter) {
+      form.setFieldsValue(parameter);
+    } else {
+      form.resetFields();
+    }
   };
 
   const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmit = () => {
+    form.validateFields().then((values) => {
+      if (editingParameter) {
+        setParameters((prev) =>
+          prev.map((param) =>
+            param.parameter_id === editingParameter.parameter_id
+              ? { ...param, ...values }
+              : param
+          )
+        );
+      } else {
+        setParameters((prev) => [
+          ...prev,
+          { ...values, parameter_id: Date.now() },
+        ]);
+      }
+      setIsModalOpen(false);
+      form.resetFields();
+    });
+  };
+
+  const handleDelete = (id) => {
+    setParameters((prev) => prev.filter((param) => param.parameter_id !== id));
     setIsModalOpen(false);
   };
 
@@ -92,9 +122,8 @@ export default function WaterParameter() {
           {parameters.map((param) => (
             <div
               key={param.parameter_id}
-              className={`parameter-card ${
-                param.nitrite !== "-" ? "alert" : ""
-              }`}
+              className="parameter-card"
+              onClick={() => showModal(param)}
             >
               <div className="parameter-header">
                 <span className="date">{param.date_and_time}</span>
@@ -123,18 +152,14 @@ export default function WaterParameter() {
                 </div>
                 <div className="parameter-item">
                   <span className="label">pH-value:</span>
-                  <span className="value">{param.pHValue}</span>
+                  <span className="value">{param.pH}</span>
                 </div>
                 <div className="parameter-item">
                   <span className="label">Ammonium (NH₄):</span>
                   <span className="value">{param.ammonium}</span>
                 </div>
                 <div className="parameter-item">
-                  <span className="label">KH:</span>
-                  <span className="value">{param.kH}</span>
-                </div>
-                <div className="parameter-item">
-                  <span className="label">Hardness:</span>
+                  <span className="label">Hardness (GH):</span>
                   <span className="value">{param.hardness}</span>
                 </div>
                 <div className="parameter-item">
@@ -162,67 +187,93 @@ export default function WaterParameter() {
           ))}
         </div>
       </div>
-      <button className="water-parameter__add-btn" onClick={handleAdd}>
+      <button className="water-parameter__add-btn" onClick={() => showModal()}>
         <FaPlus size={24} />
       </button>
       {isModalOpen && (
         <Modal
-          title="Add Water Parameter"
           open={isModalOpen}
           onCancel={handleCancel}
+          footer={null}
+          closable={false}
         >
-          {/* parameter_id int [pk] // Primary Key
-          pond_id int [ref: > Pond.pond_id] // Foreign Key to Pond
-          date_and_time datetime
-          temperature float
-          salt float
-          pH float
-          oxygen float
-          nitrate float
-          phosphate float
-          hardness float
-          nitrite float
-          ammonium float
-          description nvarchar */}
-
-          <Form>
-            <Form.Item name="pond_id" label="Pond ID">
-              <Input />
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Button type="primary" danger onClick={handleCancel}>
+              ✗
+            </Button>
+            <Button
+              type="primary"
+              style={{ backgroundColor: "green", borderColor: "green" }}
+              onClick={handleSubmit}
+            >
+              ✓
+            </Button>
+          </div>
+          <h2 style={{ textAlign: "center", marginTop: "10px" }}>
+            Change this measurement
+          </h2>
+          <Form form={form} layout="vertical">
+            <div className="parameter-grid">
+              <Form.Item name="pond_id" label="Pond">
+                <Input />
+              </Form.Item>
+              <Form.Item name="date_and_time" label="Date & time">
+                <Input />
+              </Form.Item>
+              <Form.Item name="nitrite" label="Nitrite (NO₂)">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="oxygen" label="Oxygen (O₂)">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="nitrate" label="Nitrate (NO₃)">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="temperature" label="Temperature">
+                <Input suffix="°C" />
+              </Form.Item>
+              <Form.Item name="phosphate" label="Phosphate (PO₄)">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="pH" label="pH-Value">
+                <Input />
+              </Form.Item>
+              <Form.Item name="ammonium" label="Ammonium (NH₄)">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="hardness" label="Hardness (GH)">
+                <Input suffix="°dH" />
+              </Form.Item>
+              <Form.Item name="co2" label="CO₂">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="salt" label="Salt">
+                <Input suffix="%" />
+              </Form.Item>
+              <Form.Item name="totalChlorines" label="Total chlorines">
+                <Input suffix="mg/l" />
+              </Form.Item>
+              <Form.Item name="outdoorTemp" label="Outdoor temp.">
+                <Input suffix="°C" />
+              </Form.Item>
+              <Form.Item name="amountFed" label="Amount fed">
+                <Input suffix="g" />
+              </Form.Item>
+            </div>
+            <Form.Item name="description" label="Note">
+              <Input.TextArea />
             </Form.Item>
           </Form>
-          <Form.Item name="date_and_time" label="Date and Time">
-            <Input />
-          </Form.Item>
-          <Form.Item name="temperature" label="Temperature">
-            <Input />
-          </Form.Item>
-          <Form.Item name="salt" label="Salt">
-            <Input />
-          </Form.Item>
-          <Form.Item name="pH" label="pH">
-            <Input />
-          </Form.Item>
-          <Form.Item name="oxygen" label="Oxygen">
-            <Input />
-          </Form.Item>
-          <Form.Item name="nitrate" label="Nitrate">
-            <Input />
-          </Form.Item>
-          <Form.Item name="phosphate" label="Phosphate">
-            <Input />
-          </Form.Item>
-          <Form.Item name="hardness" label="Hardness">
-            <Input />
-          </Form.Item>
-          <Form.Item name="nitrite" label="Nitrite">
-            <Input />
-          </Form.Item>
-          <Form.Item name="ammonium" label="Ammonium">
-            <Input />
-          </Form.Item>
-          <Form.Item name="description" label="Description">
-            <Input />
-          </Form.Item>
+          {editingParameter && (
+            <Button
+              type="primary"
+              danger
+              style={{ marginTop: "10px", width: "100%" }}
+              onClick={() => handleDelete(editingParameter.parameter_id)}
+            >
+              Delete measurement
+            </Button>
+          )}
         </Modal>
       )}
     </div>
