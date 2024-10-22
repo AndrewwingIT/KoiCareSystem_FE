@@ -10,7 +10,7 @@ import LoginForm from "./pages/shared/LoginAccount/login";
 import RegisterForm from "./pages/shared/LoginAccount/register";
 // import FoodCalculator from "./pages/Customer/FoodCalculator/FoodCalculator";
 import WaterParameter from "./pages/Customer/WaterParameter/WaterParameter";
-
+import MyKoi from "./pages/Customer/MyKoi/MyKoi";
 library.add(fas, fab);
 
 function App() {
@@ -23,6 +23,7 @@ function App() {
           <Route path="/home" element={<Homepage />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
+          <Route path="/my-koi" element={<MyKoi />} />
           {/* <Route path="/food-calculator" element={<FoodCalculator />} /> */}
           <Route path="/water-parameter" element={<WaterParameter />} />
 

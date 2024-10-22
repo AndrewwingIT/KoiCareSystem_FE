@@ -4,7 +4,7 @@
   width: 100%;
   overflow-x: hidden;
 
-  &__background {
+  .background {
     position: absolute;
     top: 0;
     left: 0;
@@ -53,6 +53,25 @@
     }
   }
 
+  .parameter-card {
+    &.valid {
+      border-color: green;
+    }
+
+    &.invalid {
+      border-color: orange;
+    }
+
+    .parameter-item {
+      &.valid .value {
+        color: green;
+      }
+
+      &.invalid .value {
+        color: orange;
+      }
+    }
+  }
   .parameter-header {
     display: flex;
     justify-content: space-between;

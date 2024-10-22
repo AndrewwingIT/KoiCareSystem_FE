@@ -4,6 +4,28 @@ import { Form, Input, Modal, Button } from "antd";
 import { FaPlus } from "react-icons/fa";
 
 export default function WaterParameter() {
+  //xác định giới hạn cho từng thông số
+  const limits = {
+    temperature: { min: 6.5 },
+    salt: { min: 0, max: 0.1 },
+    pH: { min: 6.9, max: 8 },
+    oxygen: { min: 6.5 },
+    nitrate: { min: 0, max: 20 },
+    phosphate: { min: 0, max: 0.035 },
+    hardness: { min: 8, max: 21 },
+    nitrite: { min: 0, max: 0.1 },
+    ammonium: { min: 0, max: 0.1 },
+    co2: { min: 5, max: 35 },
+    totalChlorines: { min: 0, max: 0.001 },
+    outdoorTemp: { min: -40, max: 40 },
+    amountFed: { min: 0, max: 99999 },
+  };
+
+  //kiểm tra xem giá trị thông số có nằm trong giới hạn không
+  const validateParameter = (value, limit) => {
+    return value >= limit.min && value <= limit.max;
+  };
+
   const [parameters, setParameters] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingParameter, setEditingParameter] = useState(null);
@@ -83,22 +105,37 @@ export default function WaterParameter() {
 
   const handleSubmit = () => {
     form.validateFields().then((values) => {
+      let hasError = false; // Tạo biến để kiểm tra xem có thông số nào sai không
+
+      // Kiểm tra từng thông số và cập nhật trạng thái valid
+      const updatedParameters = parameters.map((param) => {
+        let valid = true; // Giả định thông số hợp lệ
+        Object.keys(limits).forEach((key) => {
+          if (!validateParameter(values[key], limits[key])) {
+            valid = false; // Nếu thông số nằm ngoài giới hạn, gán valid = false
+            hasError = true; // Đánh dấu có lỗi
+          }
+        });
+        return { ...param, valid }; // Cập nhật thuộc tính valid
+      });
+
       if (editingParameter) {
-        setParameters((prev) =>
-          prev.map((param) =>
-            param.parameter_id === editingParameter.parameter_id
-              ? { ...param, ...values }
-              : param
-          )
+        setParameters(
+          updatedParameters.map((param) => {
+            if (param.parameter_id === editingParameter.parameter_id) {
+              return { ...param, ...values, valid: !hasError }; // Cập nhật thông số đang chỉnh sửa
+            }
+            return param;
+          })
         );
       } else {
-        setParameters((prev) => [
-          ...prev,
-          { ...values, parameter_id: Date.now() },
-        ]);
+        setParameters([
+          ...parameters,
+          { ...values, parameter_id: Date.now(), valid: !hasError },
+        ]); // Thêm thông số mới
       }
-      setIsModalOpen(false);
-      form.resetFields();
+      setIsModalOpen(false); // Đóng modal
+      form.resetFields(); // Xóa dữ liệu trong form
     });
   };
 
@@ -107,9 +144,17 @@ export default function WaterParameter() {
     setIsModalOpen(false);
   };
 
+  const getClassForParam = (param, value) => {
+    const { min, max } = limits[param];
+    if (value < min || value > max) {
+      return "invalid"; // Value out of range
+    }
+    return "valid"; // Value in range
+  };
+
   return (
     <div className="water-parameter">
-      <div className="water-parameter__background">
+      <div className="background">
         <img
           src="https://storage.googleapis.com/a1aa/image/GLO73CG7qeTgNKNe8yTgOc8vbjH4TKaVexjtTx2q2RBii9LnA.jpg"
           alt="Beautiful koi pond"
@@ -122,7 +167,10 @@ export default function WaterParameter() {
           {parameters.map((param) => (
             <div
               key={param.parameter_id}
-              className="parameter-card"
+              className={`parameter-card ${getClassForParam(
+                "temperature",
+                param.temperature
+              )}`}
               onClick={() => showModal(param)}
             >
               <div className="parameter-header">
@@ -130,55 +178,120 @@ export default function WaterParameter() {
                 <span className="pond-name">{param.pondName}</span>
               </div>
               <div className="parameter-grid">
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "nitrite",
+                    param.nitrite
+                  )}`}
+                >
                   <span className="label">Nitrite (NO₂):</span>
                   <span className="value">{param.nitrite}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "oxygen",
+                    param.oxygen
+                  )}`}
+                >
                   <span className="label">Oxygen (O₂):</span>
                   <span className="value">{param.oxygen}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "nitrate",
+                    param.nitrate
+                  )}`}
+                >
                   <span className="label">Nitrate (NO₃):</span>
                   <span className="value">{param.nitrate}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "temperature",
+                    param.temperature
+                  )}`}
+                >
                   <span className="label">Temperature:</span>
                   <span className="value">{param.temperature}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "phosphate",
+                    param.phosphate
+                  )}`}
+                >
                   <span className="label">Phosphate (PO₄):</span>
                   <span className="value">{param.phosphate}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "pH",
+                    param.pH
+                  )}`}
+                >
                   <span className="label">pH-value:</span>
                   <span className="value">{param.pH}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "ammonium",
+                    param.ammonium
+                  )}`}
+                >
                   <span className="label">Ammonium (NH₄):</span>
                   <span className="value">{param.ammonium}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "hardness",
+                    param.hardness
+                  )}`}
+                >
                   <span className="label">Hardness (GH):</span>
                   <span className="value">{param.hardness}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "co2",
+                    param.co2
+                  )}`}
+                >
                   <span className="label">CO₂:</span>
                   <span className="value">{param.co2}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "salt",
+                    param.salt
+                  )}`}
+                >
                   <span className="label">Salt:</span>
                   <span className="value">{param.salt}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "totalChlorines",
+                    param.totalChlorines
+                  )}`}
+                >
                   <span className="label">Total chlorines:</span>
                   <span className="value">{param.totalChlorines}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "outdoorTemp",
+                    param.outdoorTemp
+                  )}`}
+                >
                   <span className="label">Outdoor temp.:</span>
                   <span className="value">{param.outdoorTemp}</span>
                 </div>
-                <div className="parameter-item">
+                <div
+                  className={`parameter-item ${getClassForParam(
+                    "amountFed",
+                    param.amountFed
+                  )}`}
+                >
                   <span className="label">Amount fed:</span>
                   <span className="value">{param.amountFed}</span>
                 </div>
