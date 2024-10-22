@@ -1,0 +1,105 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f9f9f9;
+  margin: 0;
+  position: relative;
+  // overflow: hidden;
+}
+
+.register {
+  width: 400px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+
+  .logo {
+    width: 100px;
+    margin-bottom: 20px;
+    margin-left: 130px; // Align with login.scss
+  }
+
+  h2 {
+    color: #ff6600;
+    margin-bottom: 1em;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    input {
+      width: 100%;
+      margin-bottom: 1em;
+      padding: 0.5em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.5em;
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 1em;
+    }
+
+    label {
+      align-self: flex-start;
+      margin-bottom: 0.5em;
+    }
+  }
+
+  p {
+    margin-top: 1em;
+  }
+}
+
+.background-circles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  // overflow: hidden;
+}
+
+.circle {
+  position: absolute;
+  background-color: #ff6600;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.circle1 {
+  width: 200px;
+  height: 200px;
+  top: -50px;
+  left: -50px;
+}
+
+.circle2 {
+  width: 150px;
+  height: 150px;
+  top: 100px;
+  right: -75px;
+}
+
+.circle3 {
+  width: 100px;
+  height: 100px;
+  bottom: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+}
