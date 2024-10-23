@@ -11,6 +11,7 @@ import RegisterForm from "./pages/shared/LoginAccount/register";
 // import FoodCalculator from "./pages/Customer/FoodCalculator/FoodCalculator";
 import WaterParameter from "./pages/Customer/WaterParameter/WaterParameter";
 import MyKoi from "./pages/Customer/MyKoi/MyKoi";
+import MyPond from "./pages/Customer/MyPond/MyPond";
 library.add(fas, fab);
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/my-koi" element={<MyKoi />} />
+          <Route path="/my-pond" element={<MyPond />} />
           {/* <Route path="/food-calculator" element={<FoodCalculator />} /> */}
           <Route path="/water-parameter" element={<WaterParameter />} />
 

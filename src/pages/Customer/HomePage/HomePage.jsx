@@ -50,7 +50,7 @@ const Homepage = () => {
               </a>
             </li>
             <li>
-              <a href="/my-ponds">
+              <a href="/my-pond">
                 <FontAwesomeIcon icon={faWater} /> My ponds
               </a>
             </li>
