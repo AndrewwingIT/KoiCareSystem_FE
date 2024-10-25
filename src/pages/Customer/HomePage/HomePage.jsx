@@ -1,7 +1,7 @@
 // KoiCareSystem_FE-master/src/pages/Customer/HomePage/HomePage.jsx
-// import React from "react";
-// import { Link } from "react-router-dom";
-import "./Homepage.scss";
+import React from "react";
+import { Link } from "react-router-dom";
+import "./HomePage.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalculator,
@@ -13,9 +13,10 @@ import {
   faTint,
   faUser,
   faWater,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 
-const Homepage = () => {
+const HomePage = () => {
   return (
     <div className="homepage">
       <header className="header">
@@ -45,51 +46,51 @@ const Homepage = () => {
           <h2>Overview</h2>
           <ul>
             <li>
-              <a href="/my-koi">
+              <Link to="/my-koi">
                 <FontAwesomeIcon icon={faFish} /> My Koi
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/my-pond">
-                <FontAwesomeIcon icon={faWater} /> My ponds
-              </a>
+              <Link to="/my-pond">
+                <FontAwesomeIcon icon={faWater} /> My Pond
+              </Link>
             </li>
             <li>
-              <a href="/water-parameter">
-                <FontAwesomeIcon icon={faTint} /> Water parameter
-              </a>
+              <Link to="/water-parameter">
+                <FontAwesomeIcon icon={faTint} /> Water Parameter
+              </Link>
             </li>
             <li>
-              <a href="/food-calculator">
-                <FontAwesomeIcon icon={faCalculator} /> Food calculator
-              </a>
+              <Link to="/food-calculator">
+                <FontAwesomeIcon icon={faCalculator} /> Food Calculator
+              </Link>
             </li>
             <li>
-              <a href="/salt-calculator">
-                <FontAwesomeIcon icon={faFlask} /> Salt calculator
-              </a>
+              <Link to="/salt-calculator">
+                <FontAwesomeIcon icon={faFlask} /> Salt Calculator
+              </Link>
             </li>
             <li>
-              <a href="/recommend">
-                <FontAwesomeIcon icon={faThumbsUp} /> Recommend
-              </a>
+              <Link to="/statistics">
+                <FontAwesomeIcon icon={faChartLine} /> Statistics
+              </Link>
             </li>
           </ul>
           <ul>
             <li>
-              <a href="/about-us">About us</a>
+              <Link to="/about-us">About Us</Link>
             </li>
             <li>
-              <a href="/blog">Blog</a>
+              <Link to="/blog">Blog</Link>
             </li>
             <li>
-              <a href="/contact">Contact</a>
+              <Link to="/contact">Contact</Link>
             </li>
             <li>
-              <a href="/news">News</a>
+              <Link to="/news">News</Link>
             </li>
             <li>
-              <a href="/customer-care">Customer care</a>
+              <Link to="/customer-care">Customer Care</Link>
             </li>
           </ul>
         </aside>
@@ -151,4 +152,4 @@ const Homepage = () => {
   );
 };
 
-export default Homepage;
+export default HomePage;
