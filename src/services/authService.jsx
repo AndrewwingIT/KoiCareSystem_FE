@@ -2,8 +2,15 @@ import { message } from "antd";
 import api from "../configs/axios";
 
 export const login = async (data) => {
-  const response = await api.post("/authentication/login", data);
-  return response.data;
+  try {
+    const response = await api.post("/authentication/login", data);
+
+    return response.data;
+  } catch (error) {
+    if (error.status === 401) {
+      message.info(`Please check your email ${data.email}`);
+    }
+  }
 };
 
 export const register = async (data) => {

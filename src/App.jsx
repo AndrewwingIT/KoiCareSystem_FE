@@ -13,7 +13,8 @@ import WaterParameter from "./pages/Customer/WaterParameter/WaterParameter";
 import MyKoi from "./pages/Customer/MyKoi/MyKoi";
 import MyKoiDetail from "./pages/Customer/MyKoiDetail/MyKoiDetail";
 import MyPond from "./pages/Customer/MyPond/MyPond";
-import Statistic from "./pages/Customer/Statistics/Statistics";
+import Statistics from "./pages/Customer/Statistics/Statistics";
+
 library.add(fas, fab);
 
 function App() {
@@ -31,7 +32,8 @@ function App() {
           <Route path="/my-pond" element={<MyPond />} />
           <Route path="/food-calculator" element={<FoodCalculator />} />
           <Route path="/water-parameter" element={<WaterParameter />} />
-          <Route path="/statistics" element={<Statistic />} />
+          <Route path="/statistics" element={<Statistics />} />
+
 
           {/* Add other routes here if needed */}
         </Routes>

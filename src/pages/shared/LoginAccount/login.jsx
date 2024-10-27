@@ -43,6 +43,8 @@ const Login = () => {
     message.success(response.message);
     //lưu token vào local storage
     localStorage.setItem("token", response.token);
+    console.log("RESPONSE: ", response);
+    localStorage.setItem("userId", response.hint);
     //chuyển hướng về trang chủ
     navigate("/");
   };

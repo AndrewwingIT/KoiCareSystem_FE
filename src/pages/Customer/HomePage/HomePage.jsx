@@ -1,6 +1,6 @@
 // KoiCareSystem_FE-master/src/pages/Customer/HomePage/HomePage.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./HomePage.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -15,8 +15,12 @@ import {
   faWater,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
+import { Button, message } from "antd";
+import { LogoutOutlined } from "@ant-design/icons";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="homepage">
       <header className="header">
@@ -29,11 +33,31 @@ const HomePage = () => {
             <FontAwesomeIcon icon={["fab", "whatsapp"]} />
             <FontAwesomeIcon icon={["fab", "line"]} />
           </div>
-          <img
-            src="https://storage.googleapis.com/a1aa/image/LcUxCJJ7Y2ahCNl58MScfvgBAO6EIuuus0rN5QtsxfpUxeLnA.jpg"
-            alt="Koi fish logo"
-            className="logo"
-          />
+          <div
+            style={{
+              display: "flex",
+              verticalAlign: "baseline",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {" "}
+            <img
+              src="https://storage.googleapis.com/a1aa/image/LcUxCJJ7Y2ahCNl58MScfvgBAO6EIuuus0rN5QtsxfpUxeLnA.jpg"
+              alt="Koi fish logo"
+              className="logo"
+              style={{ width: "50%", marginRight: "5px" }}
+            />
+            <Button
+              icon={<LogoutOutlined />}
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("userId");
+                message.success("Log out!! Please login again!!");
+                navigate("/login");
+              }}
+            ></Button>
+          </div>
         </div>
       </header>
 
