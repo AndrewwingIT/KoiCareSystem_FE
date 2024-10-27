@@ -1,0 +1,139 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.statistics {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+
+    &__background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 30vh;
+        z-index: -1;
+
+        &-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .statistics__content {
+        padding-top: 25vh; // Adjusted to position below the background image
+        padding-bottom: 2rem;
+        display: flex; // Use Flexbox
+        flex-direction: column; // Center vertically
+        align-items: center; // Center horizontally
+
+        h1 {
+            text-align: center;
+            color: #ffffff;
+            font-size: 2.5rem; // Match MyPond
+            margin-bottom: 2rem; // Match MyPond
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); // Match MyPond
+        }
+
+        p {
+            text-align: center;
+            color: #ff6600;
+            margin-top: 0.5rem;
+        }
+
+        button {
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: #fff;
+            border: 1px solid #ff6600;
+            color: #ff6600;
+            border-radius: 9999px;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #ff6600;
+                color: #fff;
+            }
+        }
+
+        .statistic__koi-list {
+            margin-top: 0.5rem;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .statistics__koi-item {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+
+            &:hover {
+                background-color: #f0f0f0;
+            }
+        }
+
+        .statistics__content__selected-count {
+            color: #ffffff;
+            margin-top: 0.5rem; // Added for spacing
+        }
+
+        .statistics__content__metric-button {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .statistics__content__metric-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ff6600;
+            background-color: white;
+            color: #ff6600;
+            cursor: pointer;
+            margin-right: 0.5rem;
+
+            &--active {
+                background-color: #ff6600;
+                color: white;
+            }
+        }
+
+        .statistics__content__arrow {
+            margin-top: 1rem;
+        }
+    }
+
+    .statistics__graph-section {
+        margin-top: 2rem;
+        border-top: 1px solid #e0e0e0;
+        padding-top: 1rem;
+        display: flex; // Sử dụng Flexbox
+        flex-direction: column; // Căn giữa theo chiều dọc
+        align-items: center; // Căn giữa theo chiều ngang
+        text-align: center; // Căn giữa văn bản
+
+        .statistics__graph-section__duration {
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .statistics__graph-section__graph-placeholder {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px; // Adjust height as needed
+            background-color: #f9f9f9;
+            border: 1px dashed #e0e0e0;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+
+            p {
+                color: #6b7280; // Placeholder text color
+            }
+        }
+    }
+}
