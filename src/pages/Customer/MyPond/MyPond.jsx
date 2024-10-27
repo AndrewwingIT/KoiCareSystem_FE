@@ -1,27 +1,28 @@
 import React, { useEffect, useState } from "react";
 import "./MyPond.scss";
-import { Form, Input, Modal, Button } from "antd";
+import { Form, Input, Modal, Button, InputNumber, message } from "antd";
 import { FaPlus } from "react-icons/fa";
+import {
+  createPond,
+  getAllPonds,
+  updatePond,
+} from "../../../services/pondService";
 
 export default function MyPond() {
   const [ponds, setPonds] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPond, setEditingPond] = useState(null);
   const [form] = Form.useForm();
-
+  const fetchAllPonds = async () => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    console.log("userId: ", userId);
+    const response = await getAllPonds(userId);
+    //console.log("RESPONSE: ", response);
+    setPonds(response.data);
+  };
   useEffect(() => {
-    const fakeData = [
-      {
-        pond_id: 1,
-        name: "Hồ Koi 1",
-        volume: 3000,
-        depth: 1.5,
-        drainCount: 2,
-        skimmerCount: 1,
-        pumpingCapacity: 5000,
-      },
-    ];
-    setPonds(fakeData);
+    fetchAllPonds();
   }, []);
 
   const showModal = (pond = null) => {
@@ -39,16 +40,45 @@ export default function MyPond() {
   };
 
   const handleSubmit = () => {
-    form.validateFields().then((values) => {
+    //form dc check qua validateFields(), nếu ổn mới chạy tiếp, lỗi thì bắn lỗi
+    form.validateFields().then(async (values) => {
+      const rawUserId = localStorage.getItem("userId");
+      const userId = parseInt(rawUserId, 10);
+      console.log(typeof userId);
+      console.log("values: ", values);
+
+      const dataFormat = {
+        userId: userId,
+        name: values.name,
+        depth: values.depth,
+        volume: values.volume,
+        pumpCapacity: values.pumpCapacity,
+        drainCount: values.drainCount,
+        //"image": "string"
+      };
+      console.log("dataFormat: ", dataFormat);
       if (editingPond) {
-        setPonds(
-          ponds.map((p) =>
-            p.pond_id === editingPond.pond_id ? { ...p, ...values } : p
-          )
-        );
+        const updateDataFormat = { ...dataFormat, pondId: editingPond.pondId };
+        //update
+        console.log("update: ", updateDataFormat);
+
+        const response = await updatePond(updateDataFormat);
+        message.success(response.message);
+        // setPonds(
+        //   ponds.map((p) =>
+        //     p.pond_id === editingPond.pond_id ? { ...p, ...values } : p
+        //   )
+        // );
       } else {
-        setPonds([...ponds, { ...values, pond_id: Date.now() }]);
+        // Create pond API call
+        //gọi api tạo pond
+
+        const response = await createPond(dataFormat);
+        message.success(response.message);
+        console.log("RESPONSE: ", response);
       }
+      //lấy ra hết pond lại
+      fetchAllPonds();
       setIsModalOpen(false);
       form.resetFields();
     });
@@ -71,18 +101,18 @@ export default function MyPond() {
       <div className="my-pond__content">
         <h1>My Pond</h1>
         <div className="pond-cards">
-          {ponds.map((p) => (
+          {ponds.map((p, index) => (
             <div
-              key={p.pond_id}
+              key={p.pond_id || index}
               className="pond-card"
               onClick={() => showModal(p)}
             >
+              <p>{p.pond_id}</p>
               <h2>{p.name}</h2>
               <p>Volume: {p.volume} l</p>
               <p>Depth: {p.depth} m</p>
               <p>Drains: {p.drainCount}</p>
-              <p>Skimmers: {p.skimmerCount}</p>
-              <p>Pumping Capacity: {p.pumpingCapacity} l/h</p>
+              <p>Pumping Capacity: {p.pumpCapacity} l/h</p>
             </div>
           ))}
         </div>
@@ -113,23 +143,23 @@ export default function MyPond() {
             Add/Edit Pond
           </h2>
           <Form form={form} layout="vertical">
+            <Form.Item name="pond_id" label="Pond Id">
+              <Input disabled />
+            </Form.Item>
             <Form.Item name="name" label="Name" rules={[{ required: true }]}>
               <Input />
             </Form.Item>
             <Form.Item name="volume" label="Volume">
-              <Input suffix="l" />
+              <InputNumber min={0} max={100} step={0.1} suffix="l" />
             </Form.Item>
             <Form.Item name="depth" label="Depth">
-              <Input suffix="m" />
+              <InputNumber min={0} max={100} step={0.1} suffix="m" />
             </Form.Item>
             <Form.Item name="drainCount" label="Drain count">
-              <Input />
+              <InputNumber min={0} max={100} />
             </Form.Item>
-            <Form.Item name="skimmerCount" label="Skimmer count">
-              <Input />
-            </Form.Item>
-            <Form.Item name="pumpingCapacity" label="Pumping capacity">
-              <Input suffix="l/h" />
+            <Form.Item name="pumpCapacity" label="Pumping capacity">
+              <InputNumber min={0} max={100} step={0.1} suffix="l/h" />
             </Form.Item>
           </Form>
           {editingPond && (
