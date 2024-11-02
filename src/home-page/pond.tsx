@@ -177,11 +177,10 @@ const Pond: React.FC = () => {
               <Form.Item
                 label="Pond Id"
                 name="pondId"
-                hidden={editingPond === null}
               >
                 <Input
                   placeholder="Enter pond id"
-                  disabled={editingPond !== null}
+                  disabled // ở mode edit hoặc mode add thì làm mờ form --> auto disabled
                 />
               </Form.Item>
             </Col>
