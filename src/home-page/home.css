@@ -1,0 +1,20 @@
+.login-button {
+  background-color: #ffa500; /* Màu cam */
+  border-color: #ffa500; /* Màu cam cho viền */
+}
+
+.login-button:hover {
+  background-color: #ff8c00 !important; /* Màu cam đậm khi hover */
+  border-color: #ff8c00 !important;
+}
+
+.background-container {
+  height: 100vh; /* Chiều cao 100% của viewport */
+  width: 100%; /* Đảm bảo chiều rộng 100% */
+  background-image: url("https://koilover.vn/uploads/images/tac-dong-cua-anh-nang-mt-troi-doi-voi-ho-ca-koi-1.jpgg"); /* Thay bằng URL hình ảnh của bạn */
+  background-size: cover; /* Hình ảnh phủ toàn bộ */
+  background-position: center; /* Căn giữa hình ảnh */
+  display: flex; /* Để căn giữa nội dung */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+}
