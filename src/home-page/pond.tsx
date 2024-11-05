@@ -15,16 +15,11 @@ interface PondType {
 const Pond: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
-  const [ponds, setPonds] = useState<PondType[]>(() => {
-    const storedPonds = localStorage.getItem("ponds");
-    return storedPonds ? JSON.parse(storedPonds) : [];
-  });
+  const [ponds, setPonds] = useState<PondType[]>([]);
   const [editingPond, setEditingPond] = useState<PondType | null>(null);
 
   const fetchAllPonds = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
-    console.log("userId: ", userId);
     const rs = getAllPonds(userId);
     rs.then((x) => {
       setPonds(x.data);

@@ -1,22 +1,43 @@
-import { Card, Button, Modal, Form, Input, DatePicker, Row, Col } from "antd";
+import { Card, Button, Modal, Form, Input, DatePicker, Row, Col, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addKoi, API_SERVER } from "./api";
+import { addKoi, API_SERVER, getAllPonds } from "./api";
 import axios from "axios";
 
 const MyKoi: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [data, setData] = useState<any[]>([]);
+  const [ponds, setPonds] = useState<any[]>([]);
+  const [Load, isLoad] = useState(false);
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
 
+  const fetchAllPonds = async () => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    console.log("userId: ", userId);
+    const rs = getAllPonds(userId);
+    rs.then((x) => {
+      setPonds(x.data);
+      console.log(x);
+    }).catch((error) => {
+      console.error("Caught Error:", error);
+    });
+
+  }
+
+  useEffect(() => {
+    fetchAllPonds();
+  }, []);
   const showModal = () => {
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
     const values = form.getFieldsValue();
+    isLoad(true);
     addKoi(values);
     setIsModalOpen(false);
     form.resetFields();
@@ -30,14 +51,15 @@ const MyKoi: React.FC = () => {
   useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(`${API_SERVER}api/kois/user/3`);
+        const rs = await axios.get<any>(`${API_SERVER}api/kois/user/` + userId);
         setData(rs.data.data);
       } catch (error) {
         console.log(error);
       }
     };
     get();
-  }, []);
+    isLoad(false);
+  }, [Load]);
 
   // Dữ liệu cá Koi bao gồm ID
 
@@ -132,7 +154,7 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Image (url)"
                 name="image"
-                // rules={[{ required: true, message: "Please enter koi image!" }]}
+              // rules={[{ required: true, message: "Please enter koi image!" }]}
               >
                 <Input placeholder="Enter koi image URL" />
               </Form.Item>
@@ -170,12 +192,21 @@ const MyKoi: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label="PondId"
+                label="Pond Id"
                 name="pondId"
-                rules={[{ required: true, message: "Please enter pond!" }]}
+                rules={[{ required: true, message: "Please select a pond id!" }]}
               >
-                <Input placeholder="Enter pond" />
+                <Select
+                  placeholder="Select pond id"
+                >
+                  {ponds?.map((x) => (
+                    <Select.Option key={x?.pondId} value={x?.pondId}>
+                      {x?.name}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
+
             </Col>
             <Col span={12}>
               <Form.Item label="In pond since" name="inPondSince">
@@ -208,9 +239,22 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Physiqueld"
                 name="physiqueld"
-                rules={[{ required: true, message: "Please enter koi price!" }]}
+                rules={[{ required: true, message: "Please select a pond id!" }]}
               >
-                <Input placeholder="Enter physiqueld" type="number" />
+                <Select
+                  placeholder="Select physiqueld"
+                >
+
+                  <Select.Option value={1}>
+                    {'Slim'}
+                  </Select.Option>
+                  <Select.Option value={2}>
+                    {'Normal'}
+                  </Select.Option>
+                  <Select.Option value={3}>
+                    {'Corpulent'}
+                  </Select.Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>
