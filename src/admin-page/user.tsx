@@ -33,7 +33,7 @@ const User: React.FC = () => {
     const get = async () => {
       try {
         const rs = await axios.get<any>(API_SERVER +
-          "/staff?page=1&pageSize=1000"
+          "api/users/staff?page=1&pageSize=5"
         );
         setData(rs.data.data.listData);
       } catch (error) {
