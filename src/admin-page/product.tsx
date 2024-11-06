@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Popconfirm, message, Modal, Input, Form } from "antd";
 import axios from "axios";
+import { API_SERVER } from "../home-page/api";
 
 interface ProductData {
   productId: number;
@@ -35,8 +36,8 @@ const Product: React.FC = () => {
   useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(
-          "http://localhost:5247/api/Products/GetAll"
+        const rs = await axios.get<any>(API_SERVER +
+          "api/Products/GetAll"
         );
         setData(rs.data.data);
       } catch (error) {

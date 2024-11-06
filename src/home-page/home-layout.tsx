@@ -98,9 +98,6 @@ const HomeLayout: React.FC = () => {
             <Outlet /> {/* Render nested routes here */}
           </div>
         </Content>
-        <Footer className="!sticky" style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
       </Layout>
     </Layout>
   );

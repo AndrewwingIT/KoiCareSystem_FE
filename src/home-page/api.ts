@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API_SERVER = "http://localhost:5247/";
+export const API_SERVER = "https://localhost:7239/";
 
 export const deletePond = async (pondId: any) => {
   try {
@@ -58,16 +58,33 @@ export const updateWaterParameter = async (value: any) => {
 
 export const addWaterParameter = async (value: any) => {
   try {
-    const rs = await axios.post<any>(`${API_SERVER}api/...`, {
-      // email,
-      // password,
-    });
+    const rs = await axios.post<any>(`${API_SERVER}api/water-parameters`, value); // Directly pass 'value' here
     return rs.data;
   } catch (error) {
     console.error("Error in add waterparam:", error);
     throw error; // Rethrow the error to be handled in onFinish
   }
 };
+
+export const getAllWaterParametersByUserId = async (userId: any) => {
+  try {
+    const rs = await axios.get<any>(`${API_SERVER}api/water-parameters/user/${userId}`);
+    return rs.data;
+  } catch (error) {
+    console.error("Error in get waterparam:", error);
+    throw error; // Rethrow the error to be handled in onFinish
+  }
+}
+
+export const getAllWaterParametersByPondId = async (pondId: any) => {
+  try {
+    const rs = await axios.get<any>(`${API_SERVER}api/water-parameters/pond/${pondId}`);
+    return rs.data;
+  } catch (error) {
+    console.error("Error in get waterparam:", error);
+    throw error; // Rethrow the error to be handled in onFinish
+  }
+}
 
 export const login = async (email: string, password: string) => {
   try {
@@ -117,7 +134,7 @@ export const addKoi = async (value: any) => {
       weight: value.weight, // Required
       gender: value.gender, // Optional, defaults to an empty value
       variety: value.variety, // Optional, defaults to an empty value
-      date: value.inPondSince, // Optional, defaults to an empty value (format: "YYYY-MM-DD")
+      date: value.inPondSince.toISOString().split('T')[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
       price: value.purchasePrice, // Optional, defaults to an empty value
       imageUrl: value.image,
     });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Popconfirm, message, Input, Form } from "antd";
 import axios from "axios";
+import { API_SERVER } from "../home-page/api";
 
 interface UserData {
   userId: number;
@@ -31,8 +32,8 @@ const User: React.FC = () => {
   useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(
-          "http://localhost:5247/api/users/staff?page=1&pageSize=1000"
+        const rs = await axios.get<any>(API_SERVER +
+          "api/users/staff?page=1&pageSize=5"
         );
         setData(rs.data.data.listData);
       } catch (error) {
