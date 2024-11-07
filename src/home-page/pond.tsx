@@ -74,6 +74,8 @@ const Pond: React.FC = () => {
         //   )
         // );
       } else {
+        console.log(dataFormat);
+
         // Create pond API call
         //gọi api tạo pond
 

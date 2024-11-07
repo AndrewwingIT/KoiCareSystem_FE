@@ -108,14 +108,16 @@ const Statistics: React.FC = () => {
 
   return (
     <div className="bg-white min-h-screen flex flex-col items-center">
-      <div className="relative">
-        <img src="https://placehold.co/1920x300" alt="Koi fish swimming in a pond" className="w-full h-48 object-cover" />
-        <div className="absolute top-0 right-0 p-4 text-white">
-          <span className="font-bold">Dinh Phong</span>
-        </div>
+      <div
+        className="bg-cover bg-center h-64 w-full flex justify-center items-center"
+        style={{
+          backgroundImage:
+            "url(https://www.shutterstock.com/image-photo/koi-crystal-waters-showcases-enchanting-600nw-2500920849.jpg)",
+        }}
+      >
+        <h1 className="text-5xl font-bold text-white">Statistics</h1>
       </div>
       <div className="text-center mt-4">
-        <h1 className="text-2xl font-bold">Statistics</h1>
         <p className="mt-2">Koi growth - {selectedMetrics.length > 0 ? selectedMetrics.join(", ") : "Select metric"}</p>
         <Select
           placeholder="Select pond id"
