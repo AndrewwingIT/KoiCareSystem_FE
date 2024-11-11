@@ -14,6 +14,13 @@ const MyKoi: React.FC = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
+
   const fetchAllPonds = async () => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
@@ -92,7 +99,7 @@ const MyKoi: React.FC = () => {
                   <Row gutter={16}>
                     <Col span={12}>
                       <img
-                        src={koi?.image}
+                        src={koi?.imageUrl}
                         alt={koi?.name}
                         style={{
                           width: "100%",
@@ -106,7 +113,7 @@ const MyKoi: React.FC = () => {
                       <h3>{koi?.name}</h3>
                       <p>Age: {koi?.age} years</p>
                       <p>Length: {koi?.length} cm</p>
-                      <p>Weight: {koi?.variety} g</p>
+                      <p>Weight: {koi?.weight} g</p>
                       <p>Pond: {koi?.pondName}</p>
                     </Col>
                   </Row>
@@ -227,7 +234,18 @@ const MyKoi: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item label="Gender" name="gender">
-                <Input placeholder="Enter gender" type="text" />
+                <Select
+                  placeholder="Select Sex"
+                >
+                  <Select.Option value={'Male'}>
+                    {'Male'}
+                  </Select.Option>
+                  <Select.Option value={'Female'}>
+                    {'Female'}
+                  </Select.Option>
+
+                </Select>
+
               </Form.Item>
             </Col>
             <Col span={12}>

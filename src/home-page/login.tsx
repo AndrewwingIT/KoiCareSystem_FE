@@ -25,6 +25,7 @@ const Login: React.FC = () => {
       });
       localStorage.setItem("token", x.token);
       localStorage.setItem("userId", x.hint);
+      localStorage.setItem("Role", x.role);
     }).catch((error) => {
       console.error("Caught Error in login:", error);
       message.error("Login failed.");

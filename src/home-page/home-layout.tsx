@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
+  AreaChartOutlined,
+  BarChartOutlined,
+  CalculatorOutlined,
+  DropboxOutlined,
+  HeartOutlined,
+  PlusSquareOutlined,
+  ProductOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
@@ -31,13 +33,14 @@ function getItem(
 
 // Define your menu items with path keys
 const items: MenuItem[] = [
-  getItem("My Koi", "/my-koi", <PieChartOutlined />),
-  getItem("My Pond", "/my-pond", <DesktopOutlined />),
-  getItem("Water Parameter", "/water-parameter", <UserOutlined />),
-  getItem("Food Calculator", "/food-calculator", <TeamOutlined />),
-  getItem("Salt Calculator", "/salt-calculator", <FileOutlined />),
-  getItem("Statistics", "/statistics", <FileOutlined />),
-  getItem("Product", "/product", <FileOutlined />),
+  getItem("My Koi", "/my-koi", <HeartOutlined />),
+  getItem("My Pond", "/my-pond", <PlusSquareOutlined />),
+  getItem("Water Parameter", "/water-parameter", <BarChartOutlined />),
+  getItem("Food Calculator", "/food-calculator", <CalculatorOutlined />),
+  getItem("Salt Calculator", "/salt-calculator", <CalculatorOutlined />),
+  getItem("Statistics", "/statistics", <AreaChartOutlined />),
+  getItem("Product", "/product", <ProductOutlined />),
+  getItem("Order", "/order", <DropboxOutlined />),
 ];
 
 const HomeLayout: React.FC = () => {
@@ -57,8 +60,10 @@ const HomeLayout: React.FC = () => {
   const handleLogout = () => {
     // Implement your logout logic here
     console.log("Logging out...");
+    localStorage.clear();
     // For example, clear user session and navigate to login
-    navigate("/login"); // Uncomment if you have a login route
+    navigate("/"); // Uncomment if you have a login route
+
   };
 
   return (

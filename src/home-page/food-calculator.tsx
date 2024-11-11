@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { API_SERVER, getAllPonds } from './api';
 import { Select } from 'antd';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface PondType {
     pondId: string;
@@ -19,6 +20,14 @@ const FoodCalculator: React.FC = () => {
     const [ponds, setPonds] = useState<PondType[]>([]);
     const [selectedPondId, setSelectedPondId] = useState(null);
     const [foodAmount, setFoodAmount] = useState(0);
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        const role = localStorage.getItem("Role");
+        if (role !== "User" || role === null) {
+            navigate("/");
+        }
+    }, []);
 
     const handlePondChange = (value: any) => {
         setSelectedPondId(value);

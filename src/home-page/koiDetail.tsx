@@ -1,8 +1,19 @@
-import { Card, Col, Row, Button, Modal, Form, Input, Table } from "antd";
+import {
+  Card,
+  Col,
+  Row,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Table,
+  DatePicker,
+  message,
+} from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { API_SERVER } from "./api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Koi {
   name: string;
@@ -21,39 +32,50 @@ interface Note {
 }
 
 const KoiDetail: React.FC = () => {
-  const koi: Koi = {
-    name: "Koi 1",
-    age: 1,
-    length: 20,
-    weight: 144,
-    inPondSince: "22.10.2024",
-    purchasePrice: 100,
-    image:
-      "https://cacanhthaihoa.com/wp-content/uploads/2015/03/ca-koi-hariwake-1.jpg", // Đường dẫn đến hình ảnh koi 1
-  };
-
   const [isEditModalVisible, setEditModalVisible] = useState(false);
-  const [isAddNoteModalVisible, setAddNoteModalVisible] = useState(false);
+  const [isAddGrowthModalVisible, setAddGrowthModalVisible] = useState(false);
   const [formEdit] = Form.useForm();
-  const [formNote] = Form.useForm();
-  const [data, SetData] = useState<any>();
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [nextId, setNextId] = useState(1);
+  const [formGrowth] = Form.useForm();
+  const [data, setData] = useState<any>();
+  const [growthHistory, setGrowthHistory] = useState<any[]>([]);
   const { id } = useParams();
 
-  // Hàm xử lý sự kiện khi nhấn nút Edit
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
+
   const handleEdit = () => {
+    if (data) {
+      formEdit.setFieldsValue({
+        name: data.name,
+        age: data.age,
+        length: data.length,
+        weight: data.weight,
+        inPondSince: data.date,
+        purchasePrice: data.price,
+        sex: data.gender,
+        variety: data.variety,
+        pond: data.pondId,
+        breeder: data.breeder,
+      });
+    }
     setEditModalVisible(true);
   };
 
-  // Hàm xử lý sự kiện khi nhấn nút Add Note
-  const handleAddNote = () => {
-    setAddNoteModalVisible(true);
-  };
-
-  const handleEditOk = () => {
-    console.log("Edit Koi:", formEdit.getFieldsValue());
-    setEditModalVisible(false);
+  const handleEditOk = async () => {
+    try {
+      const values = formEdit.getFieldsValue();
+      await axios.put(`${API_SERVER}api/kois/${id}`, values); // Update the Koi
+      message.success("Koi updated successfully.");
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error("Error updating koi:", error);
+      message.error("Failed to update koi.");
+    }
   };
 
   const handleEditCancel = () => {
@@ -62,67 +84,89 @@ const KoiDetail: React.FC = () => {
   };
 
   useEffect(() => {
+    const getKoiData = async () => {
+      try {
+        const response = await axios.get<any>(`${API_SERVER}api/kois/${id}`);
+        setData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    getKoiData();
+  }, [id]);
+
+  useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(`${API_SERVER}api/kois/` + id);
-        SetData(rs.data.data);
+        const rs = await axios.get<any>(API_SERVER + "api/growth-histories/koi/" + id);
+        setGrowthHistory(rs.data.data);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
     get();
   }, []);
 
-  const handleAddNoteOk = () => {
-    const noteValues = formNote.getFieldsValue();
-    const newNote: Note = {
-      id: nextId,
-      title: noteValues.title,
-      content: noteValues.note,
+  const handleAddGrowth = () => {
+    setAddGrowthModalVisible(true);
+  };
+
+  const handleAddGrowthOk = async () => {
+    const growthValues = formGrowth.getFieldsValue();
+    const newGrowth = {
+      measurementDate: growthValues.date.format("YYYY-MM-DD"),
+      length: growthValues.length,
+      weight: growthValues.weight,
+      physique: 1,
+      koiId: 0
     };
-    setNotes([...notes, newNote]);
-    setNextId(nextId + 1); // Tăng ID cho ghi chú tiếp theo
-    setAddNoteModalVisible(false);
-    formNote.resetFields();
+
+    try {
+      const response = await axios.post(
+        `${API_SERVER}api/growth-histories`,
+        {
+          koiId: id,
+          physique: "1",
+          length: growthValues.length,
+          weight: growthValues.weight,
+          measurementDate: growthValues.date.format("YYYY-MM-DD")
+        }
+      );
+      console.log("API Response:", response.data);
+
+      setGrowthHistory([...growthHistory, newGrowth]);
+      setAddGrowthModalVisible(false);
+      formGrowth.resetFields();
+    } catch (error) {
+      console.error("Error adding growth:", error);
+      message.error("Failed to add growth entry.");
+    }
   };
 
-  const handleAddNoteCancel = () => {
-    formNote.resetFields();
-    setAddNoteModalVisible(false);
+  const handleAddGrowthCancel = () => {
+    formGrowth.resetFields();
+    setAddGrowthModalVisible(false);
   };
 
-  // Cấu hình cột cho bảng ghi chú
-  const columns = [
+  const growthColumns = [
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
+      title: "Date",
+      dataIndex: "measurementDate",
+      key: "measurementDate",
     },
     {
-      title: "Title",
-      dataIndex: "title",
-      key: "title",
+      title: "Length (cm)",
+      dataIndex: "length",
+      key: "length",
     },
     {
-      title: "Note",
-      dataIndex: "content",
-      key: "content",
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_: any, record: Note) => (
-        <Button
-          danger
-          onClick={() => {
-            setNotes(notes.filter((note) => note.id !== record.id));
-          }}
-        >
-          Delete
-        </Button>
-      ),
+      title: "Weight (g)",
+      dataIndex: "weight",
+      key: "weight",
     },
   ];
+
+
 
   return (
     <>
@@ -139,7 +183,7 @@ const KoiDetail: React.FC = () => {
         <Card
           className="!shadow-lg"
           bordered={true}
-          style={{ width: 600, margin: "16px auto" }} // Giữ nguyên cách bố trí card
+          style={{ width: 600, margin: "16px auto" }}
         >
           <Row gutter={16}>
             <Col span={12}>
@@ -149,15 +193,19 @@ const KoiDetail: React.FC = () => {
               <p>Weight: {data?.weight} g</p>
               <p>In pond since: {data?.date}</p>
               <p>Purchase price: ${data?.price}</p>
+              <p>Sex: {data?.gender}</p>
+              <p>Variety: {data?.variety}</p>
+              <p>Pond: {data?.pondId}</p>
+              <p>Breeder: {data?.breeder}</p>
             </Col>
             <Col span={12}>
               <img
-                src={data?.image}
+                src={data?.imageUrl}
                 alt={data?.name}
                 style={{
-                  width: "100%", // Đảm bảo hình ảnh chiếm toàn bộ chiều rộng của cột
-                  height: "150px", // Thiết lập chiều cao cụ thể cho hình ảnh
-                  objectFit: "contain", // Đảm bảo hình ảnh không bị méo
+                  width: "100%",
+                  height: "150px",
+                  objectFit: "contain",
                   borderRadius: 8,
                 }}
               />
@@ -166,7 +214,6 @@ const KoiDetail: React.FC = () => {
         </Card>
       </Card>
 
-      {/* Nút Edit và Add Note ở góc dưới bên phải màn hình */}
       <div
         style={{
           position: "fixed",
@@ -182,12 +229,11 @@ const KoiDetail: React.FC = () => {
         >
           Edit
         </Button>
-        <Button type="default" onClick={handleAddNote}>
-          Add Note
+        <Button type="default" onClick={handleAddGrowth}>
+          Add Growth
         </Button>
       </div>
 
-      {/* Modal cho Edit Koi */}
       <Modal
         title="Edit Koi"
         visible={isEditModalVisible}
@@ -195,55 +241,68 @@ const KoiDetail: React.FC = () => {
         onCancel={handleEditCancel}
       >
         <Form layout="vertical" form={formEdit}>
-          <Form.Item label="Name" name="name" initialValue={koi.name}>
+          <Form.Item label="Name" name="name">
             <Input />
           </Form.Item>
-          <Form.Item label="Age" name="age" initialValue={koi.age}>
+          <Form.Item label="Age" name="age">
             <Input type="number" />
           </Form.Item>
-          <Form.Item label="Length" name="length" initialValue={koi.length}>
+          <Form.Item label="Length" name="length">
             <Input type="number" />
           </Form.Item>
-          <Form.Item label="Weight" name="weight" initialValue={koi.weight}>
+          <Form.Item label="Weight" name="weight">
             <Input type="number" />
           </Form.Item>
-          <Form.Item
-            label="In Pond Since"
-            name="inPondSince"
-            initialValue={koi.inPondSince}
-          >
+          <Form.Item label="In Pond Since" name="inPondSince">
             <Input />
           </Form.Item>
-          <Form.Item
-            label="Purchase Price"
-            name="purchasePrice"
-            initialValue={koi.purchasePrice}
-          >
+          <Form.Item label="Purchase Price" name="purchasePrice">
             <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Sex" name="sex">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Variety" name="variety">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Pond" name="pond">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Breeder" name="breeder">
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
 
-      {/* Modal cho Add Note */}
       <Modal
-        title="Add Note"
-        visible={isAddNoteModalVisible}
-        onOk={handleAddNoteOk}
-        onCancel={handleAddNoteCancel}
+        title="Add Growth Entry"
+        visible={isAddGrowthModalVisible}
+        onOk={handleAddGrowthOk}
+        onCancel={handleAddGrowthCancel}
       >
-        <Form layout="vertical" form={formNote}>
-          <Form.Item label="Title" name="title">
-            <Input />
+        <Form layout="vertical" form={formGrowth}>
+          <Form.Item
+            label="Date"
+            name="date"
+            rules={[{ required: true, message: "Please select a date!" }]}
+          >
+            <DatePicker format="YYYY-MM-DD" />
           </Form.Item>
-          <Form.Item label="Note" name="note">
-            <Input.TextArea rows={4} />
+          <Form.Item label="Length (cm)" name="length">
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="Weight (g)" name="weight">
+            <Input type="number" />
           </Form.Item>
         </Form>
       </Modal>
 
-      {/* Bảng ghi chú */}
       <div style={{ margin: "16px auto", width: "80%" }}>
-        <Table dataSource={notes} columns={columns} rowKey="id" />
+        <Table
+          dataSource={growthHistory}
+          columns={growthColumns}
+          rowKey="date"
+        />
       </div>
     </>
   );

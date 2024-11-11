@@ -136,7 +136,7 @@ export const addKoi = async (value: any) => {
       variety: value.variety, // Optional, defaults to an empty value
       date: value.inPondSince.toISOString().split('T')[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
       price: value.purchasePrice, // Optional, defaults to an empty value
-      imageUrl: value.image,
+      imageURl: value.image,
     });
     console.log(rs.data);
     return rs.data;
@@ -144,6 +144,8 @@ export const addKoi = async (value: any) => {
     console.log(error);
   }
 };
+
+
 
 export const addPond = async (value: any) => {
   console.log(value);
@@ -162,4 +164,8 @@ export const addPond = async (value: any) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const deleteWaterParameter = async (paramId: number) => {
+  return await axios.delete(`${API_SERVER}api/water-parameters/${paramId}`);
 };

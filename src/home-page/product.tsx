@@ -1,6 +1,9 @@
 // src/ProductShop.tsx
 
+import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { API_SERVER } from "./api";
 
 // Define the Product interface
 export interface Product {
@@ -12,36 +15,38 @@ export interface Product {
 }
 
 // Sample product data
-const initialProducts: Product[] = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 29,
-    image: "https://via.placeholder.com/150", // Example image URL
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 19,
-    image: "https://via.placeholder.com/150", // Example image URL
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 39,
-    image: "https://via.placeholder.com/150", // Example image URL
-  },
-  // Additional products...
-];
 
 // ProductShop component
 const ProductShop: React.FC = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [cartItems, setCartItems] = useState<
     { product: Product; quantity: number }[]
   >(() => {
     const storedItems = localStorage.getItem("cartItems");
     return storedItems ? JSON.parse(storedItems) : [];
   });
+  const [initialProducts, setInitialProducts] = useState<Product[]>([]);
+  const [load, setLoad] = useState(false);
+
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const rs = await axios.get(API_SERVER + "api/Products/GetAll");
+        setInitialProducts(rs.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    get();
+    setLoad(false)
+  }, [load]);
 
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -53,32 +58,55 @@ const ProductShop: React.FC = () => {
         (item) => item.product.id === product.id
       );
       if (existingItemIndex !== -1) {
-        // If the product is already in the cart, update the quantity
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += quantity;
         return updatedItems;
       }
-      // Otherwise, add a new item
       return [...prevItems, { product, quantity }];
     });
   };
 
-  const removeFromCart = (id: number) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.product.id !== id)
-    );
-  };
-
   const buyNow = (product: Product) => {
-    addToCart(product, 1); // Always add 1 to the cart
+    addToCart(product, 1);
     alert(`${product.name} added to cart! Proceeding to checkout...`);
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
+    <div
+      style={{
+        maxWidth: "1200px",
+        margin: "0 auto",
+        padding: "20px",
+        position: "relative",
+      }}
+    >
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
         Product Shop
       </h2>
+      <button
+        onClick={() => navigate("/cart")} // Navigate to shopping cart
+        style={{
+          position: "absolute",
+          top: "0",
+          right: "0",
+          padding: "10px 15px",
+          margin: "5px",
+          backgroundColor: "#007bff",
+          color: "#fff",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          transition: "background-color 0.3s",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#0056b3")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#007bff")
+        }
+      >
+        Go to Shopping Cart
+      </button>
       <div
         style={{
           display: "flex",
@@ -115,7 +143,7 @@ const ProductShop: React.FC = () => {
             />
             <h3 style={{ margin: "10px 0" }}>{product.name}</h3>
             <p style={{ margin: "0", fontWeight: "bold" }}>
-              Price: ${product.price.toFixed(2)}
+              Price: {product.price} VND
             </p>
             <div style={{ margin: "10px 0" }}>
               <button
