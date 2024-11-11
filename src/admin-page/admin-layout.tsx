@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
   DesktopOutlined,
+  DropboxOutlined,
   PieChartOutlined,
+  ProductOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
@@ -29,10 +31,10 @@ function getItem(
 
 // Define your menu items with path keys
 const items: MenuItem[] = [
-  getItem("Product", "product", <PieChartOutlined />),
-  getItem("Category", "category", <DesktopOutlined />),
+  getItem("Product", "product", <ProductOutlined />),
+  getItem("Category", "category", <PieChartOutlined />),
   getItem("User", "user", <UserOutlined />),
-  getItem("Order", "order", <UserOutlined />)
+  getItem("Order", "order", <DropboxOutlined />)
 ];
 
 const AdminLayout: React.FC = () => {
