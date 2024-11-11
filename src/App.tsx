@@ -20,6 +20,13 @@ import FoodCalculator from "./home-page/food-calculator";
 function App() {
   return (
     <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route path="user" element={<User />}></Route>
+        <Route path="product" element={<Product />}></Route>
+        <Route path="category" element={<Category />}></Route>
+      </Route>
       <Route path="/" element={<HomeLayout />}>
         <Route path="my-koi" element={<MyKoi />}></Route>
         <Route path="my-koi/:id" element={<KoiDetail />}></Route>
@@ -30,13 +37,6 @@ function App() {
         <Route path="cart" element={<ShoppingCart />}></Route>
         <Route path="water-parameter" element={<WaterParameter />}></Route>
         <Route path="statistics" element={<Statistics />}></Route>
-      </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="user" element={<User />}></Route>
-        <Route path="product" element={<Product />}></Route>
-        <Route path="category" element={<Category />}></Route>
       </Route>
     </Routes>
   );

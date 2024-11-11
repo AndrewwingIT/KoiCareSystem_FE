@@ -122,28 +122,21 @@ export const register = async (
   }
 };
 
-export const addKoi = async (value: any) => {
-  console.log(value);
+export const addKoi = async (formData: FormData) => {
   try {
-    const rs = await axios.post(`${API_SERVER}api/kois`, {
-      pondId: value.pondId,
-      physiqueId: value.physiqueld, // Required
-      name: value.Name, // Required
-      age: value.age, // Optional, defaults to an empty value
-      length: value.length, // Required
-      weight: value.weight, // Required
-      gender: value.gender, // Optional, defaults to an empty value
-      variety: value.variety, // Optional, defaults to an empty value
-      date: value.inPondSince.toISOString().split('T')[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
-      price: value.purchasePrice, // Optional, defaults to an empty value
-      imageUrl: value.image,
+    const rs = await axios.post(`${API_SERVER}api/kois`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     console.log(rs.data);
     return rs.data;
   } catch (error) {
-    console.log(error);
+    console.error("Error in addKoi:", error);
+    throw error;
   }
 };
+
 
 export const addPond = async (value: any) => {
   console.log(value);
@@ -162,4 +155,8 @@ export const addPond = async (value: any) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const deleteWaterParameter = async (paramId: number) => {
+  return await axios.delete(`${API_SERVER}/api/water-parameters/${paramId}`);
 };

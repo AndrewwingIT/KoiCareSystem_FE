@@ -10,7 +10,7 @@ interface UserData {
   password: string;
   phone: string;
   address: string;
-}
+} 
 
 const listData: UserData[] = [
   {
@@ -32,8 +32,8 @@ const User: React.FC = () => {
   useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(API_SERVER +
-          "api/users/staff?page=1&pageSize=5"
+        const rs = await axios.get<any>(
+          API_SERVER + "api/users/staff?page=1&pageSize=5"
         );
         setData(rs.data.data.listData);
       } catch (error) {

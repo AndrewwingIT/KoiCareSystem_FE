@@ -19,17 +19,18 @@ const Pond: React.FC = () => {
   const [editingPond, setEditingPond] = useState<PondType | null>(null);
 
   const fetchAllPonds = async () => {
+    try{
     const userId = localStorage.getItem("userId");
-    const rs = getAllPonds(userId);
-    rs.then((x) => {
-      setPonds(x.data);
-      console.log(x);
-      message.success(x.message)
-    }).catch((error) => {
+    const rs = await getAllPonds(userId);
+    setPonds(rs.data);
+    console.log(rs);
+      message.success(rs.message)
+    }catch(error) {
       console.error("Caught Error:", error);
-    });
+      message.error("Failed to fetch ponds. Please try again later.");
+    }
 
-  }
+  };
   useEffect(() => {
     fetchAllPonds();
   }, []);
