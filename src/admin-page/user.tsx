@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Popconfirm, message, Input, Form } from "antd";
 import axios from "axios";
 import { API_SERVER } from "../home-page/api";
+import { useNavigate } from "react-router-dom";
 
 interface UserData {
   userId: number;
@@ -10,7 +11,7 @@ interface UserData {
   password: string;
   phone: string;
   address: string;
-} 
+}
 
 const listData: UserData[] = [
   {
@@ -29,11 +30,19 @@ const User: React.FC = () => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any>([]); // Set
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    const role = localStorage.getItem("Role");
+    if (role !== "Admin" || role === null) {
+      navigate("/");
+    }
+  }, []);
+
   useEffect(() => {
     const get = async () => {
       try {
         const rs = await axios.get<any>(
-          API_SERVER + "api/users/staff?page=1&pageSize=5"
+          API_SERVER + "api/users?page=1&pageSize=5"
         );
         setData(rs.data.data.listData);
       } catch (error) {
@@ -142,6 +151,11 @@ const User: React.FC = () => {
           record.phone
         );
       },
+    },
+    {
+      title: "Role Name",
+      dataIndex: "roleName",
+      key: "roleName",
     },
     {
       title: "Address",

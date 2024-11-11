@@ -1,11 +1,12 @@
-// src/home-page/shoppingcart.tsx
-
 import React, { useEffect, useState } from "react";
 import { Product } from "./product"; // Ensure the import path is correct
+import axios from "axios";
+import { API_SERVER } from "./api";
+import { useNavigate } from "react-router-dom";
 
 interface CartItem extends Product {
   product: any;
-  quantity: number; // Add quantity to the CartItem type
+  quantity: number;
 }
 
 const ShoppingCart: React.FC = () => {
@@ -13,6 +14,14 @@ const ShoppingCart: React.FC = () => {
     const storedItems = localStorage.getItem("cartItems");
     return storedItems ? JSON.parse(storedItems) : [];
   });
+
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
 
   const removeFromCart = (id: number) => {
     setCartItems((prevItems) => {
@@ -32,15 +41,49 @@ const ShoppingCart: React.FC = () => {
     });
   };
 
+  const userId = localStorage.getItem("userId");
   const totalAmount = cartItems.reduce((total, item) => {
     return total + item.product.price * item.quantity;
   }, 0);
 
-  const handleCheckout = () => {
-    // Implement your checkout logic here
-    alert(`Checkout successful! Total amount: $${totalAmount.toFixed(2)}`);
-    // You could redirect to a checkout page or clear the cart here
-    localStorage.removeItem("cartItems"); // Clear cart after checkout
+  const handleCheckout = async () => {
+    console.log(cartItems)
+    const orderDetails = cartItems.map((item: any) => ({
+      productId: item.product.productId,
+      quantity: item.quantity,
+      price: item.product.price,
+    }));
+
+    const order = {
+      userId: userId, // Get this from the logged-in user context
+      date: new Date().toISOString().split("T")[0], // Format as 'yyyy-MM-dd'
+      totalPrice: totalAmount,
+      status: "Pending", // Set the initial status
+      orderDetails: orderDetails,
+    };
+
+    // Example: Log the order to the console or save it to your database
+    try {
+      const rs = await axios.post<any>(`${API_SERVER}api/Orders`, order);
+      try {
+        const rss = await axios.post<any>(`${API_SERVER}api/Orders/vnpay`, {
+          orderID: rs.data.orderId,
+          amount: totalAmount,
+        });
+        window.location.href = rss.data;
+      } catch (error) {
+        console.error("Error in get waterparam:", error);
+        throw error; // Rethrow the error to be handled in onFinish
+      }
+    } catch (error) {
+      console.error("Error in get waterparam:", error);
+      throw error; // Rethrow the error to be handled in onFinish
+    }
+
+    // Implement your backend API call here, e.g., save the order
+
+    // Clear cart after checkout
+    localStorage.removeItem("cartItems");
     setCartItems([]); // Clear cart state
   };
 
@@ -88,8 +131,8 @@ const ShoppingCart: React.FC = () => {
                 <div>
                   <strong>{item.product.name}</strong>
                   <p style={{ margin: "0" }}>
-                    Price: ${item.product.price.toFixed(2)}
-                    (Quantity: {item.quantity})
+                    Price: {item.product.price} VND (Quantity:{" "}
+                    {item.quantity})
                   </p>
                 </div>
               </div>
@@ -122,7 +165,7 @@ const ShoppingCart: React.FC = () => {
             }}
           >
             <strong>Total Amount:</strong>
-            <span>${totalAmount.toFixed(2)}</span>
+            <span>{totalAmount} VND</span>
           </div>
           <button
             onClick={handleCheckout}

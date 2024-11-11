@@ -18,19 +18,30 @@ import "./waterparameter.css"; // Ensure to import the CSS file
 import {
   addWaterParameter,
   getAllPonds,
-  getAllWaterParametersByPondId,
   getAllWaterParametersByUserId,
   deleteWaterParameter,
+  API_SERVER,
 } from "./api";
 import { get } from "http";
+import { useNavigate } from "react-router-dom";
 
 const WaterParameter: React.FC = () => {
   const [parameters, setParameters] = useState<any[]>([]);
   const [listPond, setListPond] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false)
+  const [id, setId] = useState(0)
   const [form] = Form.useForm();
 
   const userId = localStorage.getItem("userId");
+
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
 
   const fetchAllPondsByUserId = async () => {
     try {
@@ -46,20 +57,8 @@ const WaterParameter: React.FC = () => {
 
   const fetchParameters = async () => {
     try {
-      // const responses = await Promise.all(
-      //     listPondId.map(async (pondId) => {
-      //         return getAllWaterParametersByPondId(pondId);
-      //     })
-      // );
-
-      // // Gộp dữ liệu từ tất cả các phản hồi vào một danh sách
-      // const allParameters = responses.flatMap(response => response.data);
-      // console.log("allParamm: ", allParameters);
-
-      // setParameters(allParameters);
       const response = await getAllWaterParametersByUserId(userId);
       setParameters(response.data);
-      console.log("P: ", response.data);
     } catch (error) {
       console.error("Error fetching parameters:", error);
     }
@@ -70,6 +69,13 @@ const WaterParameter: React.FC = () => {
   }, []);
 
   const showModal = (param?: any) => {
+    if (param) {
+      console.log(param)
+      setIsEditing(true);
+      setId(param.parameterId)
+      form.setFieldsValue(param);
+      console.log(form.getFieldsValue())
+    }
     setIsModalOpen(true);
   };
 
@@ -80,15 +86,24 @@ const WaterParameter: React.FC = () => {
 
   const handleSubmit = async (values: any) => {
     // Handle form submission
-    values.dateAndTime = values.dateAndTime
-      ? values.dateAndTime.toISOString()
-      : null;
-    console.log(values);
-    const response = await addWaterParameter(values);
-    console.log(response.data);
-    setIsModalOpen(false);
+    values.dateAndTime = new Date();
+    if (!isEditing) {
+      const response = await addWaterParameter(values);
+
+    } else {
+      try {
+        const rs = await axios.put<any>(`${API_SERVER}api/water-parameters/${id}`, values);
+      } catch (error) {
+        console.error("Error in get waterparam:", error);
+        throw error; // Rethrow the error to be handled in onFinish
+      }
+    }
+    setId(0);
+    setIsEditing(false);
     form.resetFields();
     fetchParameters();
+    setIsModalOpen(false);
+
   };
 
   const handleDelete = async (paramId: number) => {
@@ -198,7 +213,7 @@ const WaterParameter: React.FC = () => {
                     <Button className="mr-2" onClick={() => showModal(param)}>
                       Edit
                     </Button>
-                    <Button danger onClick={() => handleDelete(param.id)}>
+                    <Button danger onClick={() => handleDelete(param.parameterId)}>
                       Delete
                     </Button>
                   </>
@@ -267,17 +282,17 @@ const WaterParameter: React.FC = () => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             label="Date and Time"
             name="dateAndTime"
             rules={[{ required: true, message: "Please select date and time" }]}
           >
             <DatePicker
               showTime
-              format="YYYY-MM-DD HH:mm:ss"
+              format="YYYY-MM-DD"
               style={{ width: "100%" }}
             />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             label="Temperature"
             name="temperature"

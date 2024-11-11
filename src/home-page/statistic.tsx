@@ -4,6 +4,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { API_SERVER } from "./api";
 import axios from "axios";
 import { Select } from "antd";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -19,6 +20,14 @@ const Statistics: React.FC = () => {
 
   const koiList: string[] = ["Koi 1", "Koi 2", "Koi 3"];
   const durations: string[] = ["Last month", "Last 3 months", "Last 6 months", "Last year", "Since first water measure...", "Since first koi measure...", "Custom"];
+
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
 
   const growthHistory = [
     { measurementDate: "2024-01-02", length: 20, weight: 30 },

@@ -1,17 +1,5 @@
-import {
-  Card,
-  Button,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  Row,
-  Col,
-  Select,
-  Upload,
-  message,
-} from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { Card, Button, Modal, Form, Input, DatePicker, Row, Col, Select } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addKoi, API_SERVER, getAllPonds } from "./api";
@@ -22,10 +10,16 @@ const MyKoi: React.FC = () => {
   const [form] = Form.useForm();
   const [data, setData] = useState<any[]>([]);
   const [ponds, setPonds] = useState<any[]>([]);
-  const [load, setLoad] = useState(false);
-  const [file, setFile] = useState<File | null>(null); // State to store file
+  const [Load, isLoad] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
 
   const fetchAllPonds = async () => {
     const token = localStorage.getItem("token");
@@ -38,67 +32,27 @@ const MyKoi: React.FC = () => {
     }).catch((error) => {
       console.error("Caught Error:", error);
     });
-  };
+
+  }
 
   useEffect(() => {
     fetchAllPonds();
   }, []);
-
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = async () => {
-    try {
-      const values = form.getFieldsValue();
-
-      // Custom validation to ensure an image file is uploaded
-      if (!file) {
-        message.error("Please upload an image!");
-        return;
-      }
-
-      // Proceed to create a FormData instance and make the API call
-      const formData = new FormData();
-      formData.append("pondId", String(values.pondId));
-      formData.append("physiqueId", String(values.physiqueld));
-      formData.append("name", values.name);
-      formData.append("age", values.age ? String(values.age) : "");
-      formData.append("length", String(values.length));
-      formData.append("weight", String(values.weight));
-      formData.append("gender", values.gender || "");
-      formData.append("variety", values.variety || "");
-      formData.append(
-        "date",
-        values.inPondSince ? values.inPondSince.toISOString().split("T")[0] : ""
-      );
-      formData.append(
-        "price",
-        values.purchasePrice ? String(values.purchasePrice) : ""
-      );
-      formData.append("image", file); // Ensure file is appended
-
-      // Log FormData entries to verify
-      Array.from(formData.entries()).forEach(([key, value]) => {
-        console.log(key, value, typeof value);
-      });
-
-      // Make API call
-      await addKoi(formData);
-      message.success("Koi added successfully!");
-      setIsModalOpen(false);
-      form.resetFields();
-      setFile(null); // Reset file after submission
-    } catch (error) {
-      console.error("Error uploading image or adding koi:", error);
-      message.error("Failed to add koi.");
-    }
+  const handleOk = () => {
+    const values = form.getFieldsValue();
+    isLoad(true);
+    addKoi(values);
+    setIsModalOpen(false);
+    form.resetFields();
   };
 
   const handleCancel = () => {
     form.resetFields();
     setIsModalOpen(false);
-    setFile(null);
   };
 
   useEffect(() => {
@@ -111,24 +65,13 @@ const MyKoi: React.FC = () => {
       }
     };
     get();
-    setLoad(false);
-  }, []);
+    isLoad(false);
+  }, [Load]);
+
+  // Dữ liệu cá Koi bao gồm ID
 
   const handleCardClick = (id: number) => {
     navigate("/my-koi/" + id);
-  };
-
-  // Handle file change event
-  const handleFileChange = (info: any) => {
-    if (info.file.status === "uploading") return;
-
-    // Ensure the file is set when the status changes to "done"
-    if (info.file.status === "done") {
-      setFile(info.file.originFileObj); // Save file to state
-      message.success(`${info.file.name} file uploaded successfully.`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} file upload failed.`);
-    }
   };
 
   return (
@@ -151,12 +94,12 @@ const MyKoi: React.FC = () => {
                   className="!shadow-lg"
                   bordered={true}
                   style={{ width: 300, margin: "16px" }}
-                  onClick={() => handleCardClick(koi.koiId)}
+                  onClick={() => handleCardClick(koi.koiId)} // Gọi hàm chuyển trang khi nhấn
                 >
                   <Row gutter={16}>
                     <Col span={12}>
                       <img
-                        src={koi?.image}
+                        src={koi?.imageUrl}
                         alt={koi?.name}
                         style={{
                           width: "100%",
@@ -170,7 +113,7 @@ const MyKoi: React.FC = () => {
                       <h3>{koi?.name}</h3>
                       <p>Age: {koi?.age} years</p>
                       <p>Length: {koi?.length} cm</p>
-                      <p>Weight: {koi?.variety} g</p>
+                      <p>Weight: {koi?.weight} g</p>
                       <p>Pond: {koi?.pondName}</p>
                     </Col>
                   </Row>
@@ -208,7 +151,7 @@ const MyKoi: React.FC = () => {
             <Col span={12}>
               <Form.Item
                 label="Koi Name"
-                name="name"
+                name="Name"
                 rules={[{ required: true, message: "Please enter koi name!" }]}
               >
                 <Input placeholder="Enter koi name" />
@@ -216,17 +159,11 @@ const MyKoi: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label="Image (URL)"
+                label="Image (url)"
                 name="image"
-                //rules={[{ required: true, message: "Please upload an image!" }]}
+              // rules={[{ required: true, message: "Please enter koi image!" }]}
               >
-                <Upload
-                  onChange={handleFileChange}
-                  beforeUpload={() => false}
-                  maxCount={1}
-                >
-                  <Button icon={<UploadOutlined />}>Upload</Button>
-                </Upload>
+                <Input placeholder="Enter koi image URL" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -264,11 +201,11 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Pond Id"
                 name="pondId"
-                rules={[
-                  { required: true, message: "Please select a pond id!" },
-                ]}
+                rules={[{ required: true, message: "Please select a pond id!" }]}
               >
-                <Select placeholder="Select pond id">
+                <Select
+                  placeholder="Select pond id"
+                >
                   {ponds?.map((x) => (
                     <Select.Option key={x?.pondId} value={x?.pondId}>
                       {x?.name}
@@ -276,6 +213,7 @@ const MyKoi: React.FC = () => {
                   ))}
                 </Select>
               </Form.Item>
+
             </Col>
             <Col span={12}>
               <Form.Item label="In pond since" name="inPondSince">
@@ -296,10 +234,18 @@ const MyKoi: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item label="Gender" name="gender">
-                <Select placeholder="Select Sex">
-                  <Select.Option value={1}>{"Male"}</Select.Option>
-                  <Select.Option value={2}>{"Female"}</Select.Option>
+                <Select
+                  placeholder="Select Sex"
+                >
+                  <Select.Option value={'Male'}>
+                    {'Male'}
+                  </Select.Option>
+                  <Select.Option value={'Female'}>
+                    {'Female'}
+                  </Select.Option>
+
                 </Select>
+
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -311,14 +257,21 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Physiqueld"
                 name="physiqueld"
-                rules={[
-                  { required: true, message: "Please select a pond id!" },
-                ]}
+                rules={[{ required: true, message: "Please select a pond id!" }]}
               >
-                <Select placeholder="Select physiqueld">
-                  <Select.Option value={1}>{"Slim"}</Select.Option>
-                  <Select.Option value={2}>{"Normal"}</Select.Option>
-                  <Select.Option value={3}>{"Corpulent"}</Select.Option>
+                <Select
+                  placeholder="Select physiqueld"
+                >
+
+                  <Select.Option value={1}>
+                    {'Slim'}
+                  </Select.Option>
+                  <Select.Option value={2}>
+                    {'Normal'}
+                  </Select.Option>
+                  <Select.Option value={3}>
+                    {'Corpulent'}
+                  </Select.Option>
                 </Select>
               </Form.Item>
             </Col>

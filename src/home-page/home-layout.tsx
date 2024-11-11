@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  BarChartOutlined,
   DesktopOutlined,
   FileOutlined,
   PieChartOutlined,
@@ -33,11 +34,12 @@ function getItem(
 const items: MenuItem[] = [
   getItem("My Koi", "/my-koi", <PieChartOutlined />),
   getItem("My Pond", "/my-pond", <DesktopOutlined />),
-  getItem("Water Parameter", "/water-parameter", <UserOutlined />),
+  getItem("Water Parameter", "/water-parameter", <BarChartOutlined />),
   getItem("Food Calculator", "/food-calculator", <TeamOutlined />),
   getItem("Salt Calculator", "/salt-calculator", <FileOutlined />),
   getItem("Statistics", "/statistics", <FileOutlined />),
   getItem("Product", "/product", <FileOutlined />),
+  getItem("Order", "/order", <FileOutlined />),
 ];
 
 const HomeLayout: React.FC = () => {
@@ -57,8 +59,10 @@ const HomeLayout: React.FC = () => {
   const handleLogout = () => {
     // Implement your logout logic here
     console.log("Logging out...");
+    localStorage.clear();
     // For example, clear user session and navigate to login
-    navigate("/login"); // Uncomment if you have a login route
+    navigate("/"); // Uncomment if you have a login route
+
   };
 
   return (

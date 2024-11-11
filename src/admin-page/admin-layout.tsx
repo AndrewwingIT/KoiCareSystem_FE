@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -32,12 +32,19 @@ const items: MenuItem[] = [
   getItem("Product", "product", <PieChartOutlined />),
   getItem("Category", "category", <DesktopOutlined />),
   getItem("User", "user", <UserOutlined />),
+  getItem("Order", "order", <UserOutlined />)
 ];
 
 const AdminLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
+  useEffect(() => {
+  const role = localStorage.getItem("Role");
+  if (role !== "Admin" || role === null) {
+    navigate("/");
+  }
+}, []);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -51,8 +58,9 @@ const AdminLayout: React.FC = () => {
   const handleLogout = () => {
     // Implement your logout logic here
     console.log("Logging out...");
+    localStorage.clear();
     // For example, clear user session and navigate to login
-    navigate("/login"); // Uncomment if you have a login route
+    navigate("/"); // Uncomment if you have a login route
   };
 
   return (

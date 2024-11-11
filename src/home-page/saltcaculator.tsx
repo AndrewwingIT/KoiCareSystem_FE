@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Button, Form, Typography, message } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
@@ -7,6 +8,14 @@ const SaltCalculator: React.FC = () => {
   const [volume, setVolume] = useState<number | undefined>(undefined);
   const [concentration, setConcentration] = useState<number | undefined>(0.3); // Default to 0.3%
   const [result, setResult] = useState<number | null>(null);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
 
   const handleCalculate = () => {
     if (volume && concentration) {

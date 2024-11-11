@@ -1,7 +1,9 @@
 // src/ProductShop.tsx
 
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { API_SERVER } from "./api";
 
 // Define the Product interface
 export interface Product {
@@ -13,27 +15,6 @@ export interface Product {
 }
 
 // Sample product data
-const initialProducts: Product[] = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 29,
-    image: "https://via.placeholder.com/150", // Example image URL
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 19,
-    image: "https://via.placeholder.com/150", // Example image URL
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 39,
-    image: "https://via.placeholder.com/150", // Example image URL
-  },
-  // Additional products...
-];
 
 // ProductShop component
 const ProductShop: React.FC = () => {
@@ -44,6 +25,28 @@ const ProductShop: React.FC = () => {
     const storedItems = localStorage.getItem("cartItems");
     return storedItems ? JSON.parse(storedItems) : [];
   });
+  const [initialProducts, setInitialProducts] = useState<Product[]>([]);
+  const [load, setLoad] = useState(false);
+
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
+
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const rs = await axios.get(API_SERVER + "api/Products/GetAll");
+        setInitialProducts(rs.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    get();
+    setLoad(false)
+  }, [load]);
 
   useEffect(() => {
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
@@ -140,7 +143,7 @@ const ProductShop: React.FC = () => {
             />
             <h3 style={{ margin: "10px 0" }}>{product.name}</h3>
             <p style={{ margin: "0", fontWeight: "bold" }}>
-              Price: ${product.price.toFixed(2)}
+              Price: {product.price} VND
             </p>
             <div style={{ margin: "10px 0" }}>
               <button

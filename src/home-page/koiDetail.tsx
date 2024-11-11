@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { API_SERVER } from "./api";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface Koi {
   name: string;
@@ -40,6 +40,14 @@ const KoiDetail: React.FC = () => {
   const [growthHistory, setGrowthHistory] = useState<any[]>([]);
   const { id } = useParams();
 
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
+
   const handleEdit = () => {
     if (data) {
       formEdit.setFieldsValue({
@@ -47,11 +55,11 @@ const KoiDetail: React.FC = () => {
         age: data.age,
         length: data.length,
         weight: data.weight,
-        inPondSince: data.inPondSince,
-        purchasePrice: data.purchasePrice,
-        sex: data.sex,
+        inPondSince: data.date,
+        purchasePrice: data.price,
+        sex: data.gender,
         variety: data.variety,
-        pond: data.pond,
+        pond: data.pondId,
         breeder: data.breeder,
       });
     }
@@ -87,6 +95,18 @@ const KoiDetail: React.FC = () => {
     getKoiData();
   }, [id]);
 
+  useEffect(() => {
+    const get = async () => {
+      try {
+        const rs = await axios.get<any>(API_SERVER + "api/growth-histories/koi/" + id);
+        setGrowthHistory(rs.data.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    get();
+  }, []);
+
   const handleAddGrowth = () => {
     setAddGrowthModalVisible(true);
   };
@@ -94,15 +114,23 @@ const KoiDetail: React.FC = () => {
   const handleAddGrowthOk = async () => {
     const growthValues = formGrowth.getFieldsValue();
     const newGrowth = {
-      date: growthValues.date.format("YYYY-MM-DD"),
+      measurementDate: growthValues.date.format("YYYY-MM-DD"),
       length: growthValues.length,
       weight: growthValues.weight,
+      physique: 1,
+      koiId: 0
     };
 
     try {
       const response = await axios.post(
         `${API_SERVER}api/growth-histories`,
-        newGrowth
+        {
+          koiId: id,
+          physique: "1",
+          length: growthValues.length,
+          weight: growthValues.weight,
+          measurementDate: growthValues.date.format("YYYY-MM-DD")
+        }
       );
       console.log("API Response:", response.data);
 
@@ -123,8 +151,8 @@ const KoiDetail: React.FC = () => {
   const growthColumns = [
     {
       title: "Date",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "measurementDate",
+      key: "measurementDate",
     },
     {
       title: "Length (cm)",
@@ -138,18 +166,7 @@ const KoiDetail: React.FC = () => {
     },
   ];
 
-  // Function to handle the delete action
-  const handleDeleteKoi = async () => {
-    try {
-      await axios.delete(`${API_SERVER}api/kois/${id}`);
-      message.success("Koi deleted successfully.");
-      setEditModalVisible(false); // Close the modal after deletion
-      // Optionally, redirect or refresh the list
-    } catch (error) {
-      console.error("Error deleting koi:", error);
-      message.error("Failed to delete koi.");
-    }
-  };
+
 
   return (
     <>
@@ -174,16 +191,16 @@ const KoiDetail: React.FC = () => {
               <p>Age: {data?.age} year</p>
               <p>Length: {data?.length} cm</p>
               <p>Weight: {data?.weight} g</p>
-              <p>In pond since: {data?.inPondSince}</p>
-              <p>Purchase price: ${data?.purchasePrice}</p>
-              <p>Sex: {data?.sex}</p>
+              <p>In pond since: {data?.date}</p>
+              <p>Purchase price: ${data?.price}</p>
+              <p>Sex: {data?.gender}</p>
               <p>Variety: {data?.variety}</p>
-              <p>Pond: {data?.pond}</p>
+              <p>Pond: {data?.pondId}</p>
               <p>Breeder: {data?.breeder}</p>
             </Col>
             <Col span={12}>
               <img
-                src={data?.image}
+                src={data?.imageUrl}
                 alt={data?.name}
                 style={{
                   width: "100%",
@@ -255,13 +272,6 @@ const KoiDetail: React.FC = () => {
             <Input />
           </Form.Item>
         </Form>
-        <Button
-          type="default"
-          onClick={handleDeleteKoi}
-          style={{ marginTop: "16px" }}
-        >
-          Delete Koi
-        </Button>
       </Modal>
 
       <Modal

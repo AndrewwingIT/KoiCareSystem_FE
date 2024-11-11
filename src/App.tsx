@@ -16,6 +16,8 @@ import ShoppingCart from "./home-page/shopingcart";
 import WaterParameter from "./home-page/waterparameter";
 import Statistics from "./home-page/statistic";
 import FoodCalculator from "./home-page/food-calculator";
+import Order from "./admin-page/order";
+import OrderTable from "./home-page/order";
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         <Route path="user" element={<User />}></Route>
         <Route path="product" element={<Product />}></Route>
         <Route path="category" element={<Category />}></Route>
+        <Route path="order" element={<Order />}></Route>
       </Route>
       <Route path="/" element={<HomeLayout />}>
         <Route path="my-koi" element={<MyKoi />}></Route>
@@ -37,6 +40,7 @@ function App() {
         <Route path="cart" element={<ShoppingCart />}></Route>
         <Route path="water-parameter" element={<WaterParameter />}></Route>
         <Route path="statistics" element={<Statistics />}></Route>
+        <Route path="order" element={<OrderTable />}></Route>
       </Route>
     </Routes>
   );

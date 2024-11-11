@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { createPond, deletePond, getAllPonds, updatePond } from "./api";
 import './pond.css'
+import { useNavigate } from "react-router-dom";
 interface PondType {
   pondId: string;
   name: string;
@@ -17,6 +18,14 @@ const Pond: React.FC = () => {
   const [form] = Form.useForm();
   const [ponds, setPonds] = useState<PondType[]>([]);
   const [editingPond, setEditingPond] = useState<PondType | null>(null);
+  const [Load, isLoad] = useState(false);
+  const navigate = useNavigate();
+  useEffect(() => {
+      const role = localStorage.getItem("Role");
+      if (role !== "User" || role === null) {
+          navigate("/");
+      }
+  }, []);
 
   const fetchAllPonds = async () => {
     try{
@@ -31,9 +40,11 @@ const Pond: React.FC = () => {
     }
 
   };
+
   useEffect(() => {
     fetchAllPonds();
-  }, []);
+    isLoad(false);
+  }, [Load]);
 
   const showModal = (pond?: PondType) => {
     setEditingPond(pond || null);
@@ -49,6 +60,7 @@ const Pond: React.FC = () => {
     form.validateFields().then(async (values) => {
       const rawUserId = localStorage.getItem("userId");
       const userId = rawUserId !== null ? parseInt(rawUserId, 10) : undefined;
+      isLoad(true);
       console.log(typeof userId);
       console.log("values: ", values);
 
@@ -103,6 +115,7 @@ const Pond: React.FC = () => {
       onOk() {
         const rs = deletePond(pond.pondId);
         message.success("Delete successfully");
+        isLoad(true);
         fetchAllPonds();
       }
     })

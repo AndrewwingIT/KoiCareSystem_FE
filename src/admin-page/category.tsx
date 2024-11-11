@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Table, Button, Input, Form, message, Popconfirm } from "antd";
+import { Table, Button, Input, Form, message, Popconfirm, Modal } from "antd";
 import axios from "axios";
 import { API_SERVER } from "../home-page/api";
+import { useNavigate } from "react-router-dom";
 
 interface CategoryData {
   categoryId: number;
@@ -9,37 +10,32 @@ interface CategoryData {
   description: string;
 }
 
-const initialData: CategoryData[] = [
-  {
-    categoryId: 1,
-    name: "Category 1",
-    description: "Description of Category 1",
-  },
-  {
-    categoryId: 2,
-    name: "Category 2",
-    description: "Description of Category 2",
-  },
-];
-
 const Category: React.FC = () => {
   const [editingKey, setEditingKey] = useState<number | null>(null);
   const [form] = Form.useForm();
-  const [data, setData] = useState<any>([]); // Set
-
+  const [data, setData] = useState<CategoryData[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newCategoryForm] = Form.useForm();
+  const [load, setLoad] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
-    const get = async () => {
+    const role = localStorage.getItem("Role");
+    if (role !== "Admin" || role === null) {
+      navigate("/");
+    }
+  }, []);
+  useEffect(() => {
+    const getCategories = async () => {
       try {
-        const rs = await axios.get<any>(API_SERVER +
-          "api/Categorys/GetAll"
-        );
+        const rs = await axios.get(API_SERVER + "api/Categorys/GetAll");
         setData(rs.data.data);
       } catch (error) {
         console.error(error);
       }
     };
-    get();
-  }, []);
+    getCategories();
+    setLoad(false);
+  }, [load]);
 
   const isEditing = (record: CategoryData) => record.categoryId === editingKey;
 
@@ -55,24 +51,52 @@ const Category: React.FC = () => {
   const save = async (categoryId: number) => {
     try {
       const row = (await form.validateFields()) as CategoryData;
-      const newData = [...data];
-      const index = newData.findIndex((item) => item.categoryId === categoryId);
-
-      if (index > -1) {
-        newData[index] = { ...newData[index], ...row };
-        setData(newData);
-        setEditingKey(null);
-        message.success("Category updated successfully!");
+      try {
+        const rs = await axios.put<any>(API_SERVER + "api/Categorys", {
+          ...row,
+          categoryId,
+        });
+      } catch (error) {
+        console.error(error);
       }
+      setEditingKey(null);
+      setLoad(true);
+      message.success("Category updated successfully!");
     } catch (errInfo) {
       message.error("Update failed. Please check your inputs.");
     }
   };
 
   const deleteCategory = (categoryId: number) => {
-    const newData = data.filter((item: any) => item.categoryId !== categoryId);
+    const newData = data.filter(
+      (item: CategoryData) => item.categoryId !== categoryId
+    );
     setData(newData);
     message.success("Category deleted successfully!");
+  };
+
+  const openAddCategoryModal = () => {
+    newCategoryForm.resetFields();
+    setIsModalOpen(true);
+  };
+
+  const handleAddCategory = async () => {
+    try {
+      const newCategory = await newCategoryForm.validateFields();
+
+      try {
+        const rs = await axios.post<any>(API_SERVER + "api/Categorys", {
+          ...newCategory,
+          categoryId: 0,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      setLoad(true);
+      setIsModalOpen(false);
+    } catch (errInfo) {
+      message.error("Failed to add category. Please check your input.");
+    }
   };
 
   const columns = [
@@ -138,8 +162,8 @@ const Category: React.FC = () => {
         ) : (
           <>
             <Button
-              type="primary"
               onClick={() => edit(record)}
+              type="primary"
               style={{ marginRight: 8 }}
               disabled={editingKey !== null}
             >
@@ -164,6 +188,13 @@ const Category: React.FC = () => {
   return (
     <div style={{ padding: 24, background: "#fff", borderRadius: 8 }}>
       <h2>Category List</h2>
+      <Button
+        type="primary"
+        onClick={openAddCategoryModal}
+        style={{ marginBottom: 16 }}
+      >
+        Add Category
+      </Button>
       <Form form={form} component={false}>
         <Table
           dataSource={data}
@@ -172,6 +203,33 @@ const Category: React.FC = () => {
           pagination={false}
         />
       </Form>
+
+      {/* Add Category Modal */}
+      <Modal
+        title="Add New Category"
+        visible={isModalOpen}
+        onOk={handleAddCategory}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <Form form={newCategoryForm} layout="vertical">
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter category name" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[
+              { required: true, message: "Please enter category description" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
