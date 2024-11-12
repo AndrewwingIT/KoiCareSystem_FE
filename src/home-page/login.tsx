@@ -94,10 +94,6 @@ const Login: React.FC = () => {
                 Login
               </Button>
             </Form.Item>
-            <div className="mb-3 text-center">-Or Sign in with-</div>
-            <Button className="w-full" type="primary" htmlType="submit">
-              Login with Gmail
-            </Button>
             <div className="text-center mt-2">
               <Link to={"/register"}>Not a member? Register</Link>
             </div>

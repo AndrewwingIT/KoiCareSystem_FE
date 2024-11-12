@@ -8,6 +8,7 @@ import {
   Input,
   Form,
   Select,
+  InputNumber,
 } from "antd";
 import axios from "axios";
 import { API_SERVER } from "../home-page/api";
@@ -234,16 +235,30 @@ const Product: React.FC = () => {
           <Form.Item
             name="price"
             label="Price"
-            rules={[{ required: true, message: "Please enter the price" }]}
+            rules={[
+              { required: true, message: "Please enter the price" },
+              {
+                type: "number",
+                min: 1000,
+                message: "Price must be greater than or equal to 1000",
+              },
+            ]}
           >
-            <Input type="number" />
+            <InputNumber />
           </Form.Item>
           <Form.Item
             name="quantity"
             label="Quantity"
-            rules={[{ required: true, message: "Please enter the quantity" }]}
+            rules={[
+              { required: true, message: "Please enter the quantity" },
+              {
+                type: "number",
+                min: 1,
+                message: "Price must be greater than or equal to 1",
+              },
+            ]}
           >
-            <Input type="number" />
+            <InputNumber />
           </Form.Item>
           <Form.Item
             name="image"
@@ -254,7 +269,7 @@ const Product: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </div >
   );
 };
 

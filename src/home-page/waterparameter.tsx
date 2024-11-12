@@ -29,18 +29,18 @@ const WaterParameter: React.FC = () => {
   const [parameters, setParameters] = useState<any[]>([]);
   const [listPond, setListPond] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false)
-  const [id, setId] = useState(0)
+  const [isEditing, setIsEditing] = useState(false);
+  const [id, setId] = useState(0);
   const [form] = Form.useForm();
 
   const userId = localStorage.getItem("userId");
 
   const navigate = useNavigate();
   useEffect(() => {
-      const role = localStorage.getItem("Role");
-      if (role !== "User" || role === null) {
-          navigate("/");
-      }
+    const role = localStorage.getItem("Role");
+    if (role !== "User" || role === null) {
+      navigate("/");
+    }
   }, []);
 
   const fetchAllPondsByUserId = async () => {
@@ -58,7 +58,16 @@ const WaterParameter: React.FC = () => {
   const fetchParameters = async () => {
     try {
       const response = await getAllWaterParametersByUserId(userId);
-      setParameters(response.data);
+      const parametersWithPondNames = await Promise.all(
+        response.data.map(async (param: any) => {
+          const pondResponse = await getAllPonds(userId); // Fetch ponds to get names
+          const pond = pondResponse.data.find(
+            (pond: any) => pond.pondId === param.pondId
+          );
+          return { ...param, pondName: pond ? pond.name : "Unknown" }; // Add pond name
+        })
+      );
+      setParameters(parametersWithPondNames);
     } catch (error) {
       console.error("Error fetching parameters:", error);
     }
@@ -69,12 +78,16 @@ const WaterParameter: React.FC = () => {
   }, []);
 
   const showModal = (param?: any) => {
-    if (param) {
-      console.log(param)
+    //param.parameterId===true=>edit, false=>add
+    if (param.parameterId) {
+      console.log("param: ", param);
       setIsEditing(true);
-      setId(param.parameterId)
+      setId(param.parameterId);
+      console.log("", param.parameterId);
       form.setFieldsValue(param);
-      console.log(form.getFieldsValue())
+      console.log(form.getFieldsValue());
+    } else {
+      setIsEditing(false);
     }
     setIsModalOpen(true);
   };
@@ -89,10 +102,12 @@ const WaterParameter: React.FC = () => {
     values.dateAndTime = new Date();
     if (!isEditing) {
       const response = await addWaterParameter(values);
-
     } else {
       try {
-        const rs = await axios.put<any>(`${API_SERVER}api/water-parameters/${id}`, values);
+        const rs = await axios.put<any>(
+          `${API_SERVER}api/water-parameters/${id}`,
+          values
+        );
       } catch (error) {
         console.error("Error in get waterparam:", error);
         throw error; // Rethrow the error to be handled in onFinish
@@ -103,7 +118,6 @@ const WaterParameter: React.FC = () => {
     form.resetFields();
     fetchParameters();
     setIsModalOpen(false);
-
   };
 
   const handleDelete = async (paramId: number) => {
@@ -129,8 +143,9 @@ const WaterParameter: React.FC = () => {
       param.nitrate < 0 ||
       param.nitrate > 20 ||
       param.oxygen < 6.5 ||
-      param.temperature < 5 ||
-      param.temperature > 26 ||
+      param.oxygen > 50 ||
+      param.temperature < -40 ||
+      param.temperature > 40 ||
       param.pH < 6.9 ||
       param.pH > 8 ||
       param.ammonium < 0 ||
@@ -143,11 +158,11 @@ const WaterParameter: React.FC = () => {
       param.phosphate > 0.035;
 
     return {
-      borderColor: isOutOfRange ? "orange" : "green",
+      borderColor: isOutOfRange === true ? "orange" : "green",
     };
   };
 
-  const getParameterStyle = (param: any, key: string) => {
+  const getParameterStyle = function (param: any, key: string) {
     let isOutOfRange = false;
 
     switch (key) {
@@ -158,10 +173,10 @@ const WaterParameter: React.FC = () => {
         isOutOfRange = param.nitrate < 0 || param.nitrate > 20;
         break;
       case "oxygen":
-        isOutOfRange = param.oxygen < 6.5;
+        isOutOfRange = param.oxygen < 6.5 || param.oxygen > 50;
         break;
       case "temperature":
-        isOutOfRange = param.temperature < 5 || param.temperature > 26;
+        isOutOfRange = param.temperature < -40 || param.temperature > 40;
         break;
       case "pH":
         isOutOfRange = param.pH < 6.9 || param.pH > 8;
@@ -203,17 +218,24 @@ const WaterParameter: React.FC = () => {
       <div className="p-4">
         <Row gutter={16}>
           {parameters.map((param) => (
-            <Col span={8} key={param.id}>
+            <Col
+              span={8}
+              //key={param.id}
+            >
               <Card
                 className="parameter-card"
                 style={getCardStyle(param)}
-                title={`Pond ID: ${param.pondId}`}
+                // title={`Pond Id: ${param.pondId}`}
+                title={`Pond Name: ${param.pondName}`}
                 extra={
                   <>
                     <Button className="mr-2" onClick={() => showModal(param)}>
                       Edit
                     </Button>
-                    <Button danger onClick={() => handleDelete(param.parameterId)}>
+                    <Button
+                      danger
+                      onClick={() => handleDelete(param.parameterId)}
+                    >
                       Delete
                     </Button>
                   </>
@@ -263,7 +285,7 @@ const WaterParameter: React.FC = () => {
         </Row>
       </div>
       <Modal
-        title={isModalOpen ? "Edit Water Parameter" : "Add Water Parameter"}
+        title={isEditing ? "Edit Water Parameter" : "Add Water Parameter"}
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
@@ -296,7 +318,16 @@ const WaterParameter: React.FC = () => {
           <Form.Item
             label="Temperature"
             name="temperature"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true, message: "Please enter a Temperature value" },
+              {
+                type: "number",
+                min: -50,
+                max: 50,
+
+                message: "Temperature value must be between -50 and 50 C",
+              },
+            ]}
           >
             <InputNumber />
           </Form.Item>
@@ -308,9 +339,9 @@ const WaterParameter: React.FC = () => {
               {
                 type: "number",
                 min: 0,
-                max: 0.1,
+                max: 10,
 
-                message: "Salt value must be between 0% and 0.1%",
+                message: "Salt value must be between 0% and 10%",
               },
             ]}
           >
@@ -323,8 +354,9 @@ const WaterParameter: React.FC = () => {
               { required: true, message: "Please enter a oxygen value" },
               {
                 type: "number",
-                min: 6.5,
-                message: "Oxygen value must be higher 6.5 mg/L",
+                min: 0,
+                max: 60,
+                message: "Oxygen value must be between 0 to 60 mg/L",
               },
             ]}
           >
@@ -337,9 +369,9 @@ const WaterParameter: React.FC = () => {
               { required: true, message: "Please enter a pH value" },
               {
                 type: "number",
-                min: 6.9,
-                max: 8,
-                message: "pH value must be between 6.9 and 8",
+                min: 0,
+                max: 50,
+                message: "pH value must be between 0 and 50",
               },
             ]}
           >
@@ -353,8 +385,8 @@ const WaterParameter: React.FC = () => {
               {
                 type: "number",
                 min: 0,
-                max: 0.1,
-                message: "Nitrite value must be between 0 and 0.1 mg/l",
+                max: 50,
+                message: "Nitrite value must be between 0 and 50 mg/l",
               },
             ]}
           >
@@ -368,8 +400,8 @@ const WaterParameter: React.FC = () => {
               {
                 type: "number",
                 min: 0,
-                max: 20,
-                message: "Nitrate value must be between 0 and 20 mg/l",
+                max: 50,
+                message: "Nitrate value must be between 0 and 50 mg/l",
               },
             ]}
           >
@@ -383,12 +415,12 @@ const WaterParameter: React.FC = () => {
               {
                 type: "number",
                 min: 0,
-                max: 0.035,
-                message: "Phosphate value must be between 0 and 0.035 mg/l",
+                max: 10,
+                message: "Phosphate value must be between 0 and 10 mg/l",
               },
             ]}
           >
-            <InputNumber step={0.001} />
+            <InputNumber step={0.01} />
           </Form.Item>
           <Form.Item
             label="Hardness"
@@ -398,8 +430,8 @@ const WaterParameter: React.FC = () => {
               {
                 type: "number",
                 min: 0,
-                max: 21,
-                message: "Hardness value must be between 0 and 21 dH",
+                max: 50,
+                message: "Hardness value must be between 0 and 50 dH",
               },
             ]}
           >
@@ -413,8 +445,8 @@ const WaterParameter: React.FC = () => {
               {
                 type: "number",
                 min: 0,
-                max: 0.1,
-                message: "Ammonium value must be between 0 and 0.1 mg/l",
+                max: 10,
+                message: "Ammonium value must be between 0 and 10 mg/l",
               },
             ]}
           >
