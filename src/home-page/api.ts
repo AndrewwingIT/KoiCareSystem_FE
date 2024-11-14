@@ -132,7 +132,7 @@ export const addKoi = async (value: any) => {
       age: value.age, // Optional, defaults to an empty value
       length: value.length, // Required
       weight: value.weight, // Required
-      gender: value.gender, // Optional, defaults to an empty value
+      gender: value.gender, // Opvtional, defaults to an empty value
       variety: value.variety, // Optional, defaults to an empty value
       date: value.inPondSince.toISOString().split('T')[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
       price: value.purchasePrice, // Optional, defaults to an empty value

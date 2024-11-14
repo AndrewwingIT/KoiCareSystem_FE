@@ -1,4 +1,14 @@
-import { Card, Button, Modal, Form, Input, DatePicker, Row, Col, Select } from "antd";
+import {
+  Card,
+  Button,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  Row,
+  Col,
+  Select,
+} from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,10 +25,10 @@ const MyKoi: React.FC = () => {
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-      const role = localStorage.getItem("Role");
-      if (role !== "User" || role === null) {
-          navigate("/");
-      }
+    const role = localStorage.getItem("Role");
+    if (role !== "User" || role === null) {
+      navigate("/");
+    }
   }, []);
 
   const fetchAllPonds = async () => {
@@ -32,8 +42,7 @@ const MyKoi: React.FC = () => {
     }).catch((error) => {
       console.error("Caught Error:", error);
     });
-
-  }
+  };
 
   useEffect(() => {
     fetchAllPonds();
@@ -42,12 +51,24 @@ const MyKoi: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    const values = form.getFieldsValue();
-    isLoad(true);
-    addKoi(values);
-    setIsModalOpen(false);
-    form.resetFields();
+  const handleOk = async () => {
+    try {
+      // Xác thực các trường trong biểu mẫu và lấy giá trị
+      const values = await form.validateFields();
+      isLoad(true); // Đặt trạng thái tải lên là true
+
+      // Gọi hàm addKoi và chờ nó hoàn thành
+      await addKoi(values);
+
+      // Đóng hộp thoại và đặt lại các trường trong biểu mẫu
+      setIsModalOpen(false);
+      form.resetFields();
+    } catch (error) {
+      console.error("Lỗi khi thêm Koi:", error);
+      // Tùy chọn, bạn có thể hiển thị thông báo cho người dùng về lỗi
+    } finally {
+      isLoad(false); // Đặt lại trạng thái tải lên
+    }
   };
 
   const handleCancel = () => {
@@ -161,7 +182,7 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Image (url)"
                 name="image"
-              // rules={[{ required: true, message: "Please enter koi image!" }]}
+                rules={[{ required: true, message: "Please enter koi image!" }]}
               >
                 <Input placeholder="Enter koi image URL" />
               </Form.Item>
@@ -201,11 +222,11 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Pond Id"
                 name="pondId"
-                rules={[{ required: true, message: "Please select a pond id!" }]}
+                rules={[
+                  { required: true, message: "Please select a pond id!" },
+                ]}
               >
-                <Select
-                  placeholder="Select pond id"
-                >
+                <Select placeholder="Select pond id">
                   {ponds?.map((x) => (
                     <Select.Option key={x?.pondId} value={x?.pondId}>
                       {x?.name}
@@ -213,10 +234,13 @@ const MyKoi: React.FC = () => {
                   ))}
                 </Select>
               </Form.Item>
-
             </Col>
             <Col span={12}>
-              <Form.Item label="In pond since" name="inPondSince">
+              <Form.Item
+                label="In pond since"
+                name="inPondSince"
+                rules={[{ required: true, message: "Please select date!" }]}
+              >
                 <DatePicker
                   style={{ width: "100%" }}
                   placeholder="Select date"
@@ -233,23 +257,23 @@ const MyKoi: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Gender" name="gender">
-                <Select
-                  placeholder="Select Sex"
-                >
-                  <Select.Option value={'Male'}>
-                    {'Male'}
-                  </Select.Option>
-                  <Select.Option value={'Female'}>
-                    {'Female'}
-                  </Select.Option>
-
+              <Form.Item
+                label="Gender"
+                name="gender"
+                rules={[{ required: true, message: "Please select gender!" }]}
+              >
+                <Select placeholder="Select Sex">
+                  <Select.Option value={"Male"}>{"Male"}</Select.Option>
+                  <Select.Option value={"Female"}>{"Female"}</Select.Option>
                 </Select>
-
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Variety" name="variety">
+              <Form.Item
+                label="Variety"
+                name="variety"
+                rules={[{ required: true, message: "Please enter variety!" }]}
+              >
                 <Input placeholder="Enter variety" />
               </Form.Item>
             </Col>
@@ -257,21 +281,14 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Physiqueld"
                 name="physiqueld"
-                rules={[{ required: true, message: "Please select a pond id!" }]}
+                rules={[
+                  { required: true, message: "Please select a pond id!" },
+                ]}
               >
-                <Select
-                  placeholder="Select physiqueld"
-                >
-
-                  <Select.Option value={1}>
-                    {'Slim'}
-                  </Select.Option>
-                  <Select.Option value={2}>
-                    {'Normal'}
-                  </Select.Option>
-                  <Select.Option value={3}>
-                    {'Corpulent'}
-                  </Select.Option>
+                <Select placeholder="Select physiqueld">
+                  <Select.Option value={1}>{"Slim"}</Select.Option>
+                  <Select.Option value={2}>{"Normal"}</Select.Option>
+                  <Select.Option value={3}>{"Corpulent"}</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
