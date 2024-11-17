@@ -8,12 +8,14 @@ import {
   Row,
   Col,
   Select,
+  Upload,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addKoi, API_SERVER, getAllPonds } from "./api";
 import axios from "axios";
+import dayjs from "dayjs";
 
 const MyKoi: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,16 +34,11 @@ const MyKoi: React.FC = () => {
   }, []);
 
   const fetchAllPonds = async () => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
-    console.log("userId: ", userId);
     const rs = getAllPonds(userId);
     rs.then((x) => {
       setPonds(x.data);
-      console.log(x);
-    }).catch((error) => {
-      console.error("Caught Error:", error);
-    });
+    }).catch((error) => {});
   };
 
   useEffect(() => {
@@ -53,19 +50,17 @@ const MyKoi: React.FC = () => {
 
   const handleOk = async () => {
     try {
-      // Xác thực các trường trong biểu mẫu và lấy giá trị
       const values = await form.validateFields();
+      const stringData = JSON.stringify(values.image);
+      values.image = stringData;
+
       isLoad(true); // Đặt trạng thái tải lên là true
 
-      // Gọi hàm addKoi và chờ nó hoàn thành
       await addKoi(values);
 
-      // Đóng hộp thoại và đặt lại các trường trong biểu mẫu
       setIsModalOpen(false);
       form.resetFields();
     } catch (error) {
-      console.error("Lỗi khi thêm Koi:", error);
-      // Tùy chọn, bạn có thể hiển thị thông báo cho người dùng về lỗi
     } finally {
       isLoad(false); // Đặt lại trạng thái tải lên
     }
@@ -81,15 +76,11 @@ const MyKoi: React.FC = () => {
       try {
         const rs = await axios.get<any>(`${API_SERVER}api/kois/user/` + userId);
         setData(rs.data.data);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
     get();
     isLoad(false);
   }, [Load]);
-
-  // Dữ liệu cá Koi bao gồm ID
 
   const handleCardClick = (id: number) => {
     navigate("/my-koi/" + id);
@@ -120,7 +111,14 @@ const MyKoi: React.FC = () => {
                   <Row gutter={16}>
                     <Col span={12}>
                       <img
-                        src={koi?.imageUrl}
+                        src={(() => {
+                          try {
+                            const parsedImage = JSON.parse(koi.imageUrl);
+                            return parsedImage[0]?.thumbUrl || "";
+                          } catch (error) {
+                            return "";
+                          }
+                        })()}
                         alt={koi?.name}
                         style={{
                           width: "100%",
@@ -178,20 +176,20 @@ const MyKoi: React.FC = () => {
                 <Input placeholder="Enter koi name" />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Image (url)"
-                name="image"
-                rules={[{ required: true, message: "Please enter koi image!" }]}
-              >
-                <Input placeholder="Enter koi image URL" />
-              </Form.Item>
-            </Col>
+
             <Col span={12}>
               <Form.Item
                 label="Age"
                 name="age"
-                rules={[{ required: true, message: "Please enter koi age!" }]}
+                rules={[
+                  { required: true, message: "Please enter koi age!" },
+                  {
+                    validator: (_, value) =>
+                      value > 0
+                        ? Promise.resolve()
+                        : Promise.reject("Age must be greater than 0!"),
+                  },
+                ]}
               >
                 <Input placeholder="Enter age in years" type="number" />
               </Form.Item>
@@ -202,6 +200,12 @@ const MyKoi: React.FC = () => {
                 name="length"
                 rules={[
                   { required: true, message: "Please enter koi length!" },
+                  {
+                    validator: (_, value) =>
+                      value > 0
+                        ? Promise.resolve()
+                        : Promise.reject("Length must be greater than 0!"),
+                  },
                 ]}
               >
                 <Input placeholder="Enter length" type="number" />
@@ -213,11 +217,18 @@ const MyKoi: React.FC = () => {
                 name="weight"
                 rules={[
                   { required: true, message: "Please enter koi weight!" },
+                  {
+                    validator: (_, value) =>
+                      value > 0
+                        ? Promise.resolve()
+                        : Promise.reject("Weight must be greater than 0!"),
+                  },
                 ]}
               >
                 <Input placeholder="Enter weight" type="number" />
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Form.Item
                 label="Pond Id"
@@ -242,8 +253,9 @@ const MyKoi: React.FC = () => {
                 rules={[{ required: true, message: "Please select date!" }]}
               >
                 <DatePicker
-                  style={{ width: "100%" }}
-                  placeholder="Select date"
+                  maxDate={dayjs()}
+                  className="w-full"
+                  format="YYYY-MM-DD"
                 />
               </Form.Item>
             </Col>
@@ -251,7 +263,15 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 label="Purchase price"
                 name="purchasePrice"
-                rules={[{ required: true, message: "Please enter koi price!" }]}
+                rules={[
+                  { required: true, message: "Please enter koi price!" },
+                  {
+                    validator: (_, value) =>
+                      value > 0
+                        ? Promise.resolve()
+                        : Promise.reject("Price must be greater than 0!"),
+                  },
+                ]}
               >
                 <Input placeholder="Enter price" type="number" />
               </Form.Item>
@@ -290,6 +310,28 @@ const MyKoi: React.FC = () => {
                   <Select.Option value={2}>{"Normal"}</Select.Option>
                   <Select.Option value={3}>{"Corpulent"}</Select.Option>
                 </Select>
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="image"
+                label="Upload Image"
+                valuePropName="fileList"
+                getValueFromEvent={(e) => {
+                  if (Array.isArray(e)) {
+                    return e;
+                  }
+                  return e?.fileList;
+                }}
+                rules={[{ required: true, message: "Please upload an image" }]}
+              >
+                <Upload
+                  name="image"
+                  listType="picture"
+                  beforeUpload={() => false} // Prevent automatic upload
+                >
+                  <Button>Click to Upload</Button>
+                </Upload>
               </Form.Item>
             </Col>
           </Row>

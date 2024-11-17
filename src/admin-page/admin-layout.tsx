@@ -34,7 +34,7 @@ const items: MenuItem[] = [
   getItem("Product", "product", <ProductOutlined />),
   getItem("Category", "category", <PieChartOutlined />),
   getItem("User", "user", <UserOutlined />),
-  getItem("Order", "order", <DropboxOutlined />)
+  getItem("Order", "order", <DropboxOutlined />),
 ];
 
 const AdminLayout: React.FC = () => {
@@ -42,11 +42,11 @@ const AdminLayout: React.FC = () => {
   const navigate = useNavigate(); // Initialize useNavigate for navigation
 
   useEffect(() => {
-  const role = localStorage.getItem("Role");
-  if (role !== "Admin" || role === null) {
-    navigate("/");
-  }
-}, []);
+    const role = localStorage.getItem("Role");
+    if (role !== "Admin" || role === null) {
+      navigate("/");
+    }
+  }, []);
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -71,6 +71,12 @@ const AdminLayout: React.FC = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        style={{
+          position: "sticky",
+          top: 0, // Keeps the Sider stuck to the top of the viewport
+          height: "100vh", // Ensures the Sider covers the full viewport height
+          zIndex: 100, // Makes sure it's above other elements
+        }}
       >
         <div className="demo-logo-vertical" />
         <Menu
@@ -102,9 +108,6 @@ const AdminLayout: React.FC = () => {
             <Outlet /> {/* Render nested routes here */}
           </div>
         </Content>
-        <Footer className="!sticky" style={{ textAlign: "center" }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
-        </Footer>
       </Layout>
     </Layout>
   );

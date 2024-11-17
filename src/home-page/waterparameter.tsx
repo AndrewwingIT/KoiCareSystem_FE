@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import {
   Card,
   Button,
@@ -11,6 +12,7 @@ import {
   message,
   Row,
   Col,
+  Tooltip,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -291,167 +293,253 @@ const WaterParameter: React.FC = () => {
         footer={null}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item
-            label="Pond Name"
-            name="pondId"
-            rules={[{ required: true, message: "Please select a Pond ID" }]}
-          >
-            <Select placeholder="Select Pond Name">
-              {listPond.map((pond) => (
-                <Select.Option key={pond.pondId} value={pond.pondId}>
-                  {pond.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          {/* <Form.Item
-            label="Date and Time"
-            name="dateAndTime"
-            rules={[{ required: true, message: "Please select date and time" }]}
-          >
-            <DatePicker
-              showTime
-              format="YYYY-MM-DD"
-              style={{ width: "100%" }}
-            />
-          </Form.Item> */}
-          <Form.Item
-            label="Temperature"
-            name="temperature"
-            rules={[
-              { required: true, message: "Please enter a Temperature value" },
-              {
-                type: "number",
-                min: -50,
-                max: 50,
-
-                message: "Temperature value must be between -50 and 50 C",
-              },
-            ]}
-          >
-            <InputNumber />
-          </Form.Item>
-          <Form.Item
-            label="Salt"
-            name="salt"
-            rules={[
-              { required: true, message: "Please enter a Salt value" },
-              {
-                type: "number",
-                min: 0,
-                max: 10,
-
-                message: "Salt value must be between 0% and 10%",
-              },
-            ]}
-          >
-            <InputNumber step={0.01} />
-          </Form.Item>{" "}
-          <Form.Item
-            label="Oxygen (O₂)"
-            name="oxygen"
-            rules={[
-              { required: true, message: "Please enter a oxygen value" },
-              {
-                type: "number",
-                min: 0,
-                max: 60,
-                message: "Oxygen value must be between 0 to 60 mg/L",
-              },
-            ]}
-          >
-            <InputNumber step={0.1} />
-          </Form.Item>
-          <Form.Item
-            label="pH-value"
-            name="ph"
-            rules={[
-              { required: true, message: "Please enter a pH value" },
-              {
-                type: "number",
-                min: 0,
-                max: 50,
-                message: "pH value must be between 0 and 50",
-              },
-            ]}
-          >
-            <InputNumber step={0.1} />
-          </Form.Item>
-          <Form.Item
-            label="Nitrite (NO₂)"
-            name="nitrite"
-            rules={[
-              { required: true, message: "Please enter a nitrite value" },
-              {
-                type: "number",
-                min: 0,
-                max: 50,
-                message: "Nitrite value must be between 0 and 50 mg/l",
-              },
-            ]}
-          >
-            <InputNumber step={0.01} />
-          </Form.Item>
-          <Form.Item
-            label="Nitrate (NO₃)"
-            name="nitrate"
-            rules={[
-              { required: true, message: "Please enter a nitrate value" },
-              {
-                type: "number",
-                min: 0,
-                max: 50,
-                message: "Nitrate value must be between 0 and 50 mg/l",
-              },
-            ]}
-          >
-            <InputNumber step={1} />
-          </Form.Item>
-          <Form.Item
-            label="Phosphate (PO₃)"
-            name="phosphate"
-            rules={[
-              { required: true, message: "Please enter a phosphate value" },
-              {
-                type: "number",
-                min: 0,
-                max: 10,
-                message: "Phosphate value must be between 0 and 10 mg/l",
-              },
-            ]}
-          >
-            <InputNumber step={0.01} />
-          </Form.Item>
-          <Form.Item
-            label="Hardness"
-            name="hardness"
-            rules={[
-              { required: true, message: "Please enter a hardness value" },
-              {
-                type: "number",
-                min: 0,
-                max: 50,
-                message: "Hardness value must be between 0 and 50 dH",
-              },
-            ]}
-          >
-            <InputNumber step={1} />
-          </Form.Item>
-          <Form.Item
-            label="Ammonium (NH₄)"
-            name="ammonium"
-            rules={[
-              { required: true, message: "Please enter a ammonium value" },
-              {
-                type: "number",
-                min: 0,
-                max: 10,
-                message: "Ammonium value must be between 0 and 10 mg/l",
-              },
-            ]}
-          >
-            <InputNumber step={0.01} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span>
+                    Pond Name
+                    <Tooltip title="Select the pond where the koi is located">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="pondId"
+                rules={[{ required: true, message: "Please select a Pond ID" }]}
+              >
+                <Select placeholder="Select Pond Name">
+                  {listPond.map((pond) => (
+                    <Select.Option key={pond.pondId} value={pond.pondId}>
+                      {pond.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Temperature
+                    <Tooltip title="Enter the temperature of the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="temperature"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter a Temperature value",
+                  },
+                  {
+                    type: "number",
+                    min: -50,
+                    max: 50,
+                    message: "Temperature value must be between -50 and 50 C",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Salt
+                    <Tooltip title="Enter the salt percentage in the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="salt"
+                rules={[
+                  { required: true, message: "Please enter a Salt value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 10,
+                    message: "Salt value must be between 0% and 10%",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={0.01} />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Oxygen (O₂)
+                    <Tooltip title="Enter the oxygen concentration in the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="oxygen"
+                rules={[
+                  { required: true, message: "Please enter a oxygen value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 60,
+                    message: "Oxygen value must be between 0 to 60 mg/L",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={0.1} />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    pH-value
+                    <Tooltip title="Enter the pH value of the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="ph"
+                rules={[
+                  { required: true, message: "Please enter a pH value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 50,
+                    message: "pH value must be between 0 and 50",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={0.1} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label={
+                  <span>
+                    Nitrite (NO₂)
+                    <Tooltip title="Enter the nitrite concentration in the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="nitrite"
+                rules={[
+                  { required: true, message: "Please enter a nitrite value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 50,
+                    message: "Nitrite value must be between 0 and 50 mg/l",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={0.01} />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Nitrate (NO₃)
+                    <Tooltip title="Enter the nitrate concentration in the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="nitrate"
+                rules={[
+                  { required: true, message: "Please enter a nitrate value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 50,
+                    message: "Nitrate value must be between 0 and 50 mg/l",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={1} />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Phosphate (PO₃)
+                    <Tooltip title="Enter the phosphate concentration in the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="phosphate"
+                rules={[
+                  { required: true, message: "Please enter a phosphate value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 10,
+                    message: "Phosphate value must be between 0 and 10 mg/l",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={0.01} />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Hardness
+                    <Tooltip title="Enter the water hardness in the pond">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="hardness"
+                rules={[
+                  { required: true, message: "Please enter a hardness value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 50,
+                    message: "Hardness value must be between 0 and 50 dH",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={1} />
+              </Form.Item>
+              <Form.Item
+                label={
+                  <span>
+                    Ammonium (NH₄)
+                    <Tooltip title="Enter the ammonium concentration in the pond water">
+                      <ExclamationCircleOutlined
+                        style={{ marginLeft: 8, color: "red" }}
+                      />
+                    </Tooltip>
+                  </span>
+                }
+                name="ammonium"
+                rules={[
+                  { required: true, message: "Please enter a ammonium value" },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 10,
+                    message: "Ammonium value must be between 0 and 10 mg/l",
+                  },
+                ]}
+              >
+                <InputNumber className="w-full" step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item
             label="Description"
             name="description"

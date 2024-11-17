@@ -14,7 +14,7 @@ const Login: React.FC = () => {
         navigate("/my-koi");
       }
       if (x?.role === "Admin") {
-        navigate("/admin");
+        navigate("/admin/user");
       }
       console.log(x);
       message.success(x?.message);
@@ -31,7 +31,9 @@ const Login: React.FC = () => {
       message.error("Login failed.");
       notification.error({
         message: "Login Error",
-        description: error.response?.data.errorMessages || "Something went wrong during login.",
+        description:
+          error.response?.data.errorMessages ||
+          "Something went wrong during login.",
         duration: 5,
       });
     });

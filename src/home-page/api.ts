@@ -10,17 +10,17 @@ export const deletePond = async (pondId: any) => {
     console.error("Error in delete pond:", error);
     throw error; // Rethrow the error to be handled in onFinish
   }
-}
+};
 
 export const getAllPonds = async (userId: any) => {
   try {
-    const rs = await axios.get<any>(`${API_SERVER}api/ponds/${userId}`);
+    const rs = await axios.get<any>(`${API_SERVER}api/ponds/user/${userId}`);
     return rs.data;
   } catch (error) {
     console.error("Error in get waterparam:", error);
     throw error; // Rethrow the error to be handled in onFinish
   }
-}
+};
 
 export const createPond = async (value: any) => {
   console.log("VALUE: ", value);
@@ -58,7 +58,10 @@ export const updateWaterParameter = async (value: any) => {
 
 export const addWaterParameter = async (value: any) => {
   try {
-    const rs = await axios.post<any>(`${API_SERVER}api/water-parameters`, value); // Directly pass 'value' here
+    const rs = await axios.post<any>(
+      `${API_SERVER}api/water-parameters`,
+      value
+    ); // Directly pass 'value' here
     return rs.data;
   } catch (error) {
     console.error("Error in add waterparam:", error);
@@ -68,23 +71,27 @@ export const addWaterParameter = async (value: any) => {
 
 export const getAllWaterParametersByUserId = async (userId: any) => {
   try {
-    const rs = await axios.get<any>(`${API_SERVER}api/water-parameters/user/${userId}`);
+    const rs = await axios.get<any>(
+      `${API_SERVER}api/water-parameters/user/${userId}`
+    );
     return rs.data;
   } catch (error) {
     console.error("Error in get waterparam:", error);
     throw error; // Rethrow the error to be handled in onFinish
   }
-}
+};
 
 export const getAllWaterParametersByPondId = async (pondId: any) => {
   try {
-    const rs = await axios.get<any>(`${API_SERVER}api/water-parameters/pond/${pondId}`);
+    const rs = await axios.get<any>(
+      `${API_SERVER}api/water-parameters/pond/${pondId}`
+    );
     return rs.data;
   } catch (error) {
     console.error("Error in get waterparam:", error);
     throw error; // Rethrow the error to be handled in onFinish
   }
-}
+};
 
 export const login = async (email: string, password: string) => {
   try {
@@ -99,7 +106,6 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-
 export const register = async (
   name: string,
   email: string,
@@ -108,13 +114,16 @@ export const register = async (
   address: string
 ) => {
   try {
-    const rs = await axios.post<any>(`${API_SERVER}api/authentication/register`, {
-      name,
-      email,
-      password,
-      phone,
-      address
-    });
+    const rs = await axios.post<any>(
+      `${API_SERVER}api/authentication/register`,
+      {
+        name,
+        email,
+        password,
+        phone,
+        address,
+      }
+    );
     return rs.data;
   } catch (error) {
     console.error("Error in register function:", error);
@@ -134,7 +143,7 @@ export const addKoi = async (value: any) => {
       weight: value.weight, // Required
       gender: value.gender, // Opvtional, defaults to an empty value
       variety: value.variety, // Optional, defaults to an empty value
-      date: value.inPondSince.toISOString().split('T')[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
+      date: value.inPondSince.toISOString().split("T")[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
       price: value.purchasePrice, // Optional, defaults to an empty value
       imageURl: value.image,
     });
@@ -144,8 +153,6 @@ export const addKoi = async (value: any) => {
     console.log(error);
   }
 };
-
-
 
 export const addPond = async (value: any) => {
   console.log(value);

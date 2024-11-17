@@ -29,6 +29,7 @@ const User: React.FC = () => {
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [form] = Form.useForm();
   const [data, setData] = useState<any>([]); // Set
+  const [load, setLoad] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -42,15 +43,17 @@ const User: React.FC = () => {
     const get = async () => {
       try {
         const rs = await axios.get<any>(
-          API_SERVER + "api/users?page=1&pageSize=5"
+          API_SERVER + "api/users?page=1&pageSize=1000"
         );
         setData(rs.data.data.listData);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoad(false);
       }
     };
     get();
-  }, []);
+  }, [load]);
 
   // Check if the row is currently being edited
   const isEditing = (record: UserData) => record.userId === editingUserId;
@@ -79,14 +82,31 @@ const User: React.FC = () => {
       message.success("User updated successfully!");
     } catch (error) {
       message.error("Update failed. Please check your input.");
+    } finally {
+      setLoad(true);
     }
   };
 
   // Delete user from the list
-  const handleDelete = (userId: number) => {
-    const newData = data.filter((user: any) => user.userId !== userId);
-    setData(newData);
-    message.success(`Deleted user with ID: ${userId}`);
+  const handleDelete = async (userId: number) => {
+    try {
+      const rs = await axios.delete<any>(API_SERVER + "api/users/" + userId);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoad(true);
+    }
+  };
+  const handleActive = async (userId: number) => {
+    try {
+      const rs = await axios.put<any>(
+        API_SERVER + "api/users/active/" + userId
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoad(true);
+    }
   };
 
   const columns = [
@@ -158,6 +178,12 @@ const User: React.FC = () => {
       key: "roleName",
     },
     {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (value: any) => <>{value === 1 ? "Active" : "InActive"}</>,
+    },
+    {
       title: "Address",
       dataIndex: "address",
       key: "address",
@@ -211,6 +237,14 @@ const User: React.FC = () => {
                 Delete
               </Button>
             </Popconfirm>
+            <Button
+              className="ml-2"
+              type="primary"
+              style={{ backgroundColor: "#28a745", borderColor: "#28a745" }}
+              onClick={() => handleActive(record.userId)}
+            >
+              Active
+            </Button>
           </>
         );
       },
@@ -219,7 +253,7 @@ const User: React.FC = () => {
 
   return (
     <div style={{ padding: 24, background: "#fff", borderRadius: 8 }}>
-      <h2>User List</h2>
+      <p className="text-2xl font-bold">User List</p>
       <Form form={form} component={false}>
         <Table
           dataSource={data}

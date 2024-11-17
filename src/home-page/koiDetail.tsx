@@ -9,11 +9,15 @@ import {
   Table,
   DatePicker,
   message,
+  Select,
+  Popconfirm,
 } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { API_SERVER } from "./api";
+import { API_SERVER, getAllPonds } from "./api";
 import { useNavigate, useParams } from "react-router-dom";
+import moment from "moment";
+import dayjs from "dayjs";
 
 interface Koi {
   name: string;
@@ -39,13 +43,16 @@ const KoiDetail: React.FC = () => {
   const [data, setData] = useState<any>();
   const [growthHistory, setGrowthHistory] = useState<any[]>([]);
   const { id } = useParams();
+  const [lóad, setLoad] = useState(false);
+  const [ponds, setPonds] = useState<any[]>([]);
+  const [imageUrl, setImageUrl] = useState();
 
   const navigate = useNavigate();
   useEffect(() => {
-      const role = localStorage.getItem("Role");
-      if (role !== "User" || role === null) {
-          navigate("/");
-      }
+    const role = localStorage.getItem("Role");
+    if (role !== "User" || role === null) {
+      navigate("/");
+    }
   }, []);
 
   const handleEdit = () => {
@@ -55,12 +62,11 @@ const KoiDetail: React.FC = () => {
         age: data.age,
         length: data.length,
         weight: data.weight,
-        inPondSince: data.date,
-        purchasePrice: data.price,
-        sex: data.gender,
+        date: moment(data.date),
+        price: data.price,
+        gender: data.gender,
         variety: data.variety,
-        pond: data.pondId,
-        breeder: data.breeder,
+        pondId: data.pondId,
       });
     }
     setEditModalVisible(true);
@@ -68,13 +74,32 @@ const KoiDetail: React.FC = () => {
 
   const handleEditOk = async () => {
     try {
-      const values = formEdit.getFieldsValue();
-      await axios.put(`${API_SERVER}api/kois/${id}`, values); // Update the Koi
-      message.success("Koi updated successfully.");
-      setEditModalVisible(false);
+      const fieldsValid = await formEdit.validateFields();
+
+      if (fieldsValid) {
+        const values = formEdit.getFieldsValue();
+        values.imageUrl = imageUrl;
+        console.log(values);
+        await axios.put(`${API_SERVER}api/kois/${id}`, {
+          ...values,
+          date: values.date.toISOString().split("T")[0], // Format date as string (YYYY-MM-DD)
+        });
+        message.success("Koi updated successfully.");
+        setLoad(true);
+        setEditModalVisible(false);
+      }
     } catch (error) {
-      console.error("Error updating koi:", error);
       message.error("Failed to update koi.");
+    }
+  };
+
+  const deleteKoi = async (id: number) => {
+    try {
+      const response = await axios.delete<any>(`${API_SERVER}api/kois/${id}`);
+      setData(response.data.data);
+      navigate("../my-koi");
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -83,22 +108,38 @@ const KoiDetail: React.FC = () => {
     setEditModalVisible(false);
   };
 
+  const fetchAllPonds = async () => {
+    const userId = localStorage.getItem("userId");
+    const rs = getAllPonds(userId);
+    rs.then((x) => {
+      setPonds(x.data);
+      console.log(x);
+    }).catch((error) => {
+      console.error("Caught Error:", error);
+    });
+  };
+
   useEffect(() => {
     const getKoiData = async () => {
       try {
         const response = await axios.get<any>(`${API_SERVER}api/kois/${id}`);
         setData(response.data.data);
+        setImageUrl(response.data.data.imageUrl);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     getKoiData();
-  }, [id]);
+    setLoad(false);
+    fetchAllPonds();
+  }, [lóad]);
 
   useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(API_SERVER + "api/growth-histories/koi/" + id);
+        const rs = await axios.get<any>(
+          API_SERVER + "api/growth-histories/koi/" + id
+        );
         setGrowthHistory(rs.data.data);
       } catch (error) {
         console.error(error);
@@ -118,22 +159,17 @@ const KoiDetail: React.FC = () => {
       length: growthValues.length,
       weight: growthValues.weight,
       physique: 1,
-      koiId: 0
+      koiId: 0,
     };
 
     try {
-      const response = await axios.post(
-        `${API_SERVER}api/growth-histories`,
-        {
-          koiId: id,
-          physique: "1",
-          length: growthValues.length,
-          weight: growthValues.weight,
-          measurementDate: growthValues.date.format("YYYY-MM-DD")
-        }
-      );
-      console.log("API Response:", response.data);
-
+      const response = await axios.post(`${API_SERVER}api/growth-histories`, {
+        koiId: id,
+        physique: "1",
+        length: growthValues.length,
+        weight: growthValues.weight,
+        measurementDate: growthValues.date.format("YYYY-MM-DD"),
+      });
       setGrowthHistory([...growthHistory, newGrowth]);
       setAddGrowthModalVisible(false);
       formGrowth.resetFields();
@@ -166,8 +202,6 @@ const KoiDetail: React.FC = () => {
     },
   ];
 
-
-
   return (
     <>
       <div
@@ -191,24 +225,59 @@ const KoiDetail: React.FC = () => {
               <p>Age: {data?.age} year</p>
               <p>Length: {data?.length} cm</p>
               <p>Weight: {data?.weight} g</p>
-              <p>In pond since: {data?.date}</p>
-              <p>Purchase price: ${data?.price}</p>
+              <p>In pond since: {moment(data?.date).format("DD.MM.yyyy")}</p>
+              <p>
+                Purchase price:{" "}
+                {data?.price
+                  ? new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(data.price)
+                  : "N/A"}
+              </p>
               <p>Sex: {data?.gender}</p>
               <p>Variety: {data?.variety}</p>
               <p>Pond: {data?.pondId}</p>
-              <p>Breeder: {data?.breeder}</p>
             </Col>
             <Col span={12}>
               <img
-                src={data?.imageUrl}
+                src={(() => {
+                  try {
+                    const parsedImage = JSON.parse(data.imageUrl);
+                    return parsedImage[0]?.thumbUrl || "";
+                  } catch (error) {
+                    return "";
+                  }
+                })()}
                 alt={data?.name}
                 style={{
                   width: "100%",
                   height: "150px",
-                  objectFit: "contain",
+                  objectFit: "cover",
                   borderRadius: 8,
                 }}
               />
+              <div className="flex justify-end">
+                <Popconfirm
+                  title="Are you sure you want to delete this koi?"
+                  onConfirm={() => deleteKoi(data.koiId)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button className="mt-5" type="primary" danger>
+                    Delete
+                  </Button>
+                </Popconfirm>
+                <Button
+                  className="mt-5 ml-2"
+                  type="primary"
+                  onClick={() => {
+                    navigate("../my-koi");
+                  }}
+                >
+                  Back to my koi
+                </Button>
+              </div>
             </Col>
           </Row>
         </Card>
@@ -247,29 +316,58 @@ const KoiDetail: React.FC = () => {
           <Form.Item label="Age" name="age">
             <Input type="number" />
           </Form.Item>
-          <Form.Item label="Length" name="length">
+          <Form.Item label="In Pond Since" name="date">
+            <DatePicker
+              maxDate={dayjs()}
+              className="w-full"
+              format="YYYY-MM-DD"
+            />
+          </Form.Item>
+          <Form.Item
+            label="Purchase Price"
+            name="price"
+            rules={[
+              { required: true, message: "Please input the purchase price!" },
+              {
+                validator: (_, value) => {
+                  if (!value || value <= 0) {
+                    return Promise.reject(
+                      "The purchase price must be greater than 0!"
+                    );
+                  }
+                  return Promise.resolve();
+                },
+              },
+            ]}
+          >
             <Input type="number" />
           </Form.Item>
-          <Form.Item label="Weight" name="weight">
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item label="In Pond Since" name="inPondSince">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Purchase Price" name="purchasePrice">
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item label="Sex" name="sex">
-            <Input />
+
+          <Form.Item
+            label="Gender"
+            name="gender"
+            rules={[{ required: true, message: "Please select gender!" }]}
+          >
+            <Select placeholder="Select Sex">
+              <Select.Option value={"Male"}>{"Male"}</Select.Option>
+              <Select.Option value={"Female"}>{"Female"}</Select.Option>
+            </Select>
           </Form.Item>
           <Form.Item label="Variety" name="variety">
             <Input />
           </Form.Item>
-          <Form.Item label="Pond" name="pond">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Breeder" name="breeder">
-            <Input />
+          <Form.Item
+            label="Pond Id"
+            name="pondId"
+            rules={[{ required: true, message: "Please select a pond id!" }]}
+          >
+            <Select placeholder="Select pond id">
+              {ponds?.map((x) => (
+                <Select.Option key={x?.pondId} value={x?.pondId}>
+                  {x?.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

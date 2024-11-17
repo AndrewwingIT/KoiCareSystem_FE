@@ -89,9 +89,7 @@ const Category: React.FC = () => {
           ...newCategory,
           categoryId: 0,
         });
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
       setLoad(true);
       setIsModalOpen(false);
     } catch (errInfo) {
@@ -187,7 +185,7 @@ const Category: React.FC = () => {
 
   return (
     <div style={{ padding: 24, background: "#fff", borderRadius: 8 }}>
-      <h2>Category List</h2>
+      <p className="text-2xl mb-2">Category List</p>
       <Button
         type="primary"
         onClick={openAddCategoryModal}

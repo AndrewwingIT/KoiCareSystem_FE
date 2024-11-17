@@ -63,7 +63,6 @@ const HomeLayout: React.FC = () => {
     localStorage.clear();
     // For example, clear user session and navigate to login
     navigate("/"); // Uncomment if you have a login route
-
   };
 
   return (
@@ -72,6 +71,12 @@ const HomeLayout: React.FC = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={(value) => setCollapsed(value)}
+        style={{
+          position: "sticky",
+          top: 0, // Keeps the Sider stuck to the top of the viewport
+          height: "100vh", // Ensures the Sider covers the full viewport height
+          zIndex: 100, // Makes sure it's above other elements
+        }}
       >
         <div className="demo-logo-vertical" />
         <Menu

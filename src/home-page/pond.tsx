@@ -2,7 +2,7 @@ import { Button, Form, Modal, Input, Row, Col, Card, message } from "antd";
 import React, { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { createPond, deletePond, getAllPonds, updatePond } from "./api";
-import './pond.css'
+import "./pond.css";
 import { useNavigate } from "react-router-dom";
 interface PondType {
   pondId: string;
@@ -21,24 +21,21 @@ const Pond: React.FC = () => {
   const [Load, isLoad] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
-      const role = localStorage.getItem("Role");
-      if (role !== "User" || role === null) {
-          navigate("/");
-      }
+    const role = localStorage.getItem("Role");
+    if (role !== "User" || role === null) {
+      navigate("/");
+    }
   }, []);
 
   const fetchAllPonds = async () => {
-    try{
-    const userId = localStorage.getItem("userId");
-    const rs = await getAllPonds(userId);
-    setPonds(rs.data);
-    console.log(rs);
-      message.success(rs.message)
-    }catch(error) {
+    try {
+      const userId = localStorage.getItem("userId");
+      const rs = await getAllPonds(userId);
+      setPonds(rs.data);
+    } catch (error) {
       console.error("Caught Error:", error);
       message.error("Failed to fetch ponds. Please try again later.");
     }
-
   };
 
   useEffect(() => {
@@ -61,8 +58,6 @@ const Pond: React.FC = () => {
       const rawUserId = localStorage.getItem("userId");
       const userId = rawUserId !== null ? parseInt(rawUserId, 10) : undefined;
       isLoad(true);
-      console.log(typeof userId);
-      console.log("values: ", values);
 
       const dataFormat = {
         userId: userId,
@@ -71,32 +66,16 @@ const Pond: React.FC = () => {
         volume: parseFloat(values.volume),
         pumpCapacity: parseFloat(values.pumpCapacity),
         drainCount: parseInt(values.drainCount),
-        //"image": "string"
       };
       console.log("dataFormat: ", dataFormat);
       if (editingPond) {
         const updateDataFormat = { ...dataFormat, pondId: editingPond.pondId };
-        //update
-        console.log("update: ", updateDataFormat);
-
         const response = await updatePond(updateDataFormat);
         message.success(response.message);
-        // setPonds(
-        //   ponds.map((p) =>
-        //     p.pond_id === editingPond.pond_id ? { ...p, ...values } : p
-        //   )
-        // );
       } else {
-        console.log(dataFormat);
-
-        // Create pond API call
-        //gọi api tạo pond
-
         const response = await createPond(dataFormat);
         message.success(response.message);
-        console.log("RESPONSE: ", response);
       }
-      //lấy ra hết pond lại
       fetchAllPonds();
       setIsModalOpen(false);
       form.resetFields();
@@ -117,10 +96,9 @@ const Pond: React.FC = () => {
         message.success("Delete successfully");
         isLoad(true);
         fetchAllPonds();
-      }
-    })
-
-  }
+      },
+    });
+  };
 
   return (
     <>
@@ -150,15 +128,19 @@ const Pond: React.FC = () => {
       {/* Display Pond Cards */}
       <div className="p-4">
         <Row gutter={16}>
-          {ponds.map((pond) => (
+          {ponds?.map((pond) => (
             <Col span={8} key={pond.pondId}>
               <Card
                 className="shadow-xl"
                 title={pond.name}
                 extra={
                   <>
-                    <Button className="mr-2" onClick={() => showModal(pond)}>Edit</Button>
-                    <Button danger onClick={() => handleDelete(pond)}>Delete</Button>
+                    <Button className="mr-2" onClick={() => showModal(pond)}>
+                      Edit
+                    </Button>
+                    <Button danger onClick={() => handleDelete(pond)}>
+                      Delete
+                    </Button>
                   </>
                 }
                 style={{ width: 300 }}
@@ -185,10 +167,7 @@ const Pond: React.FC = () => {
         <Form layout="vertical" form={form}>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item
-                label="Pond Id"
-                name="pondId"
-              >
+              <Form.Item label="Pond Id" name="pondId">
                 <Input
                   placeholder="Enter pond id"
                   disabled // ở mode edit hoặc mode add thì làm mờ form --> auto disabled
@@ -209,7 +188,20 @@ const Pond: React.FC = () => {
                 label="Volume (liters)"
                 name="volume"
                 rules={[
-                  { required: true, message: "Please enter pond volume!" },
+                  {
+                    required: true,
+                    message: "Please input the volume!",
+                  },
+                  {
+                    validator: (_, value) => {
+                      if (!value || value <= 0) {
+                        return Promise.reject(
+                          "The value must be greater than 0!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
                 ]}
               >
                 <Input placeholder="Enter volume in liters" type="number" />
@@ -221,6 +213,16 @@ const Pond: React.FC = () => {
                 name="depth"
                 rules={[
                   { required: true, message: "Please enter pond depth!" },
+                  {
+                    validator: (_, value) => {
+                      if (!value || value <= 0) {
+                        return Promise.reject(
+                          "The value must be greater than 0!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
                 ]}
               >
                 <Input placeholder="Enter depth in meters" type="number" />
@@ -232,6 +234,16 @@ const Pond: React.FC = () => {
                 name="drainCount"
                 rules={[
                   { required: true, message: "Please enter drain count!" },
+                  {
+                    validator: (_, value) => {
+                      if (!value || value <= 0) {
+                        return Promise.reject(
+                          "The value must be greater than 0!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
                 ]}
               >
                 <Input placeholder="Enter drain count" type="number" />
@@ -243,6 +255,16 @@ const Pond: React.FC = () => {
                 name="pumpCapacity"
                 rules={[
                   { required: true, message: "Please enter pumping capacity!" },
+                  {
+                    validator: (_, value) => {
+                      if (!value || value <= 0) {
+                        return Promise.reject(
+                          "The value must be greater than 0!"
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
                 ]}
               >
                 <Input placeholder="Enter pumping capacity" type="number" />

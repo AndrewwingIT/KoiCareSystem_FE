@@ -9,20 +9,23 @@ const Register: React.FC = () => {
   const onFinish = (values: any) => {
     console.log("Form Values:", values);
 
-    const rs = register(values.name, values.email, values.password, values.phone, values.address);
+    const rs = register(
+      values.name,
+      values.email,
+      values.password,
+      values.phone,
+      values.address
+    );
 
     rs.then((result) => {
       console.log("Result:", result);
       message.success(result.message);
-      navigate('/login');
-
+      navigate("/login");
     }).catch((error) => {
       console.error("Caught Error in onFinish:", error.response.data);
-      message.error(error.response.data)
+      message.error(error.response.data);
     });
   };
-
-
 
   return (
     <div
@@ -75,18 +78,25 @@ const Register: React.FC = () => {
               name="password"
               rules={[
                 { required: true, message: "Please input your password!" },
-                { min: 6, message: "Password must be at least 6 characters long!" },
+                {
+                  min: 6,
+                  message: "Password must be at least 6 characters long!",
+                },
               ]}
             >
               <Input.Password />
             </Form.Item>
 
-            <Form.Item label="Phone (Optional):" name="phone" rules={[
-              {
-                pattern: /^0\d{7}(\d{2})?$/,
-                message: "Phone number must start with 0 and be 8 or 10 digits long!",
-              },
-            ]}
+            <Form.Item
+              label="Phone (Optional):"
+              name="phone"
+              rules={[
+                {
+                  pattern: /^0\d{7}(\d{2})?$/,
+                  message:
+                    "Phone number must start with 0 and be 8 or 10 digits long!",
+                },
+              ]}
             >
               <Input />
             </Form.Item>
@@ -109,7 +119,7 @@ const Register: React.FC = () => {
           </Form>
         </Card>
       </div>
-    </div >
+    </div>
   );
 };
 

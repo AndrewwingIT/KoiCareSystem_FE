@@ -3,6 +3,7 @@ import { Product } from "./product"; // Ensure the import path is correct
 import axios from "axios";
 import { API_SERVER } from "./api";
 import { useNavigate } from "react-router-dom";
+import { Button, message } from "antd";
 
 interface CartItem extends Product {
   product: any;
@@ -17,17 +18,17 @@ const ShoppingCart: React.FC = () => {
 
   const navigate = useNavigate();
   useEffect(() => {
-      const role = localStorage.getItem("Role");
-      if (role !== "User" || role === null) {
-          navigate("/");
-      }
+    const role = localStorage.getItem("Role");
+    if (role !== "User" || role === null) {
+      navigate("/");
+    }
   }, []);
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (productId: number) => {
     setCartItems((prevItems) => {
       const updatedCart = prevItems
         .map((item) => {
-          if (item.product.id === id) {
+          if (item.product.productId === productId) {
             // Decrease the quantity
             const updatedQuantity = item.quantity - 1;
             return { ...item, quantity: updatedQuantity };
@@ -47,7 +48,7 @@ const ShoppingCart: React.FC = () => {
   }, 0);
 
   const handleCheckout = async () => {
-    console.log(cartItems)
+    console.log(cartItems);
     const orderDetails = cartItems.map((item: any) => ({
       productId: item.product.productId,
       quantity: item.quantity,
@@ -73,11 +74,10 @@ const ShoppingCart: React.FC = () => {
         window.location.href = rss.data;
       } catch (error) {
         console.error("Error in get waterparam:", error);
-        throw error; // Rethrow the error to be handled in onFinish
+        message.error("Check out error");
       }
     } catch (error) {
       console.error("Error in get waterparam:", error);
-      throw error; // Rethrow the error to be handled in onFinish
     }
 
     // Implement your backend API call here, e.g., save the order
@@ -103,7 +103,7 @@ const ShoppingCart: React.FC = () => {
         <p style={{ textAlign: "center" }}>Your cart is empty.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          {cartItems.map((item) => (
+          {cartItems.map((item: any) => (
             <div
               key={item.id}
               style={{
@@ -119,7 +119,14 @@ const ShoppingCart: React.FC = () => {
             >
               <div style={{ display: "flex", alignItems: "center" }}>
                 <img
-                  src={item.product.image}
+                  src={(() => {
+                    try {
+                      const parsedImage = JSON.parse(item.product.image);
+                      return parsedImage[0]?.thumbUrl || "";
+                    } catch (error) {
+                      return "";
+                    }
+                  })()}
                   alt={item.product.name}
                   style={{
                     width: "50px",
@@ -131,13 +138,13 @@ const ShoppingCart: React.FC = () => {
                 <div>
                   <strong>{item.product.name}</strong>
                   <p style={{ margin: "0" }}>
-                    Price: {item.product.price} VND (Quantity:{" "}
+                    Price: {item.product.price.toLocaleString()} đ (Quantity:{" "}
                     {item.quantity})
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => removeFromCart(item.product.id)}
+                onClick={() => removeFromCart(item.product.productId)}
                 style={{
                   padding: "5px 10px",
                   backgroundColor: "#dc3545",
@@ -165,24 +172,43 @@ const ShoppingCart: React.FC = () => {
             }}
           >
             <strong>Total Amount:</strong>
-            <span>{totalAmount} VND</span>
+            <span>{totalAmount.toLocaleString()} đ</span>
           </div>
-          <button
-            onClick={handleCheckout}
-            style={{
-              marginTop: "20px",
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              transition: "background-color 0.3s",
-              alignSelf: "center",
-            }}
-          >
-            Checkout
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={handleCheckout}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#28a745",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                transition: "background-color 0.3s",
+                alignSelf: "center",
+              }}
+            >
+              Checkout
+            </button>
+            <button
+              className="ml-5"
+              onClick={() => navigate("../product")}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#1677ff",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                transition: "background-color 0.3s",
+                alignSelf: "center",
+              }}
+            >
+              Back to shopping
+            </button>
+          </div>
         </div>
       )}
     </div>

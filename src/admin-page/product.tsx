@@ -9,11 +9,13 @@ import {
   Form,
   Select,
   InputNumber,
+  Upload,
 } from "antd";
 import axios from "axios";
 import { API_SERVER } from "../home-page/api";
 import { Option } from "antd/es/mentions";
 import { useNavigate } from "react-router-dom";
+import { render } from "@testing-library/react";
 
 interface ProductData {
   productId: number;
@@ -72,8 +74,32 @@ const Product: React.FC = () => {
   // Open modal for editing
   const handleEdit = (product: ProductData) => {
     setIsEditing(true);
-    setEditingProduct(product);
-    form.setFieldsValue(product);
+    let parsedImage;
+    try {
+      parsedImage = JSON.parse(product.image);
+    } catch (error) {
+      parsedImage = [
+        {
+          uid: "rc-upload-default-1",
+          lastModified: Date.now(),
+          lastModifiedDate: new Date().toISOString(),
+          name: "default-image.jpg",
+          size: 0,
+          type: "image/jpeg",
+          percent: 0,
+          originFileObj: {
+            uid: "rc-upload-default-1",
+          },
+          thumbUrl: "data:image/png;base64,iVBmRyRsKGBxuqDIT", // This is a base64-encoded image placeholder
+        },
+      ];
+    }
+    console.log(parsedImage);
+    setEditingProduct({ ...product, image: parsedImage });
+    form.setFieldsValue({
+      ...product,
+      image: parsedImage,
+    });
     setIsModalOpen(true);
   };
 
@@ -96,6 +122,7 @@ const Product: React.FC = () => {
   const saveProduct = async () => {
     try {
       const values = await form.validateFields();
+      const stringData = JSON.stringify(values.image);
 
       if (isEditing && editingProduct) {
         // Update existing product
@@ -103,14 +130,19 @@ const Product: React.FC = () => {
           const rs = await axios.put(API_SERVER + "api/Products", {
             ...values,
             productId: editingProduct.productId,
+            image: stringData,
           });
+          message.success("Product updated successfully!");
         } catch (error) {
           console.error(error);
         }
-        message.success("Product updated successfully!");
       } else {
         // Add new product
-        const newProduct = { ...values, productId: 0 }; // Mock ID for new product
+        const newProduct = {
+          ...values,
+          productId: 0,
+          image: stringData,
+        }; // Mock ID for new product
         try {
           const rs = await axios.post(API_SERVER + "api/Products", newProduct);
         } catch (error) {
@@ -121,7 +153,7 @@ const Product: React.FC = () => {
 
       setIsModalOpen(false);
       setEditingProduct(null);
-      setLoad(true)
+      setLoad(true);
     } catch (error) {
       message.error("Please check your input.");
     }
@@ -136,22 +168,54 @@ const Product: React.FC = () => {
 
   const columns = [
     { title: "Product ID", dataIndex: "productId", key: "productId" },
-    { title: "Category ID", dataIndex: "categoryId", key: "categoryId" },
+    {
+      title: "Category Name",
+      dataIndex: "categoryId",
+      key: "categoryId",
+      render: (value: any) => (
+        <>{category.find((x) => x.categoryId === value).name}</>
+      ),
+    },
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Description", dataIndex: "description", key: "description" },
-    { title: "Price", dataIndex: "price", key: "price" },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      render: (price: any) =>
+        new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+        }).format(price),
+    },
     { title: "Quantity", dataIndex: "quantity", key: "quantity" },
     {
       title: "Image",
       dataIndex: "image",
       key: "image",
-      render: (imageUrl: string) => (
-        <img
-          src={imageUrl}
-          alt="Product"
-          style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 4 }}
-        />
-      ),
+      render: (imageUrl: string) => {
+        try {
+          const parsedImage = JSON.parse(imageUrl);
+          if (Array.isArray(parsedImage) && parsedImage.length > 0) {
+            return (
+              <img
+                src={parsedImage[0].thumbUrl}
+                alt="Product"
+                style={{
+                  width: 50,
+                  height: 50,
+                  objectFit: "cover",
+                  borderRadius: 4,
+                }}
+              />
+            );
+          }
+          return <span>No image</span>;
+        } catch (error) {
+          console.error("Invalid JSON for image:", error);
+          return <span>Invalid image</span>;
+        }
+      },
     },
     {
       title: "Action",
@@ -182,7 +246,7 @@ const Product: React.FC = () => {
 
   return (
     <div style={{ padding: 24, background: "#fff", borderRadius: 8 }}>
-      <h2>Product List</h2>
+      <p className="text-2xl mb-5">Product List</p>
       <Button type="primary" onClick={handleAdd} style={{ marginBottom: 16 }}>
         Add New Product
       </Button>
@@ -244,7 +308,7 @@ const Product: React.FC = () => {
               },
             ]}
           >
-            <InputNumber />
+            <InputNumber className="w-full" />
           </Form.Item>
           <Form.Item
             name="quantity"
@@ -258,18 +322,31 @@ const Product: React.FC = () => {
               },
             ]}
           >
-            <InputNumber />
+            <InputNumber className="w-full" />
           </Form.Item>
           <Form.Item
             name="image"
-            label="Image URL"
-            rules={[{ required: true, message: "Please enter the image URL" }]}
+            label="Upload Image"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => {
+              if (Array.isArray(e)) {
+                return e;
+              }
+              return e?.fileList;
+            }}
+            rules={[{ required: true, message: "Please upload an image" }]}
           >
-            <Input />
+            <Upload
+              name="image"
+              listType="picture"
+              beforeUpload={() => false} // Prevent automatic upload
+            >
+              <Button>Click to Upload</Button>
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>
-    </div >
+    </div>
   );
 };
 

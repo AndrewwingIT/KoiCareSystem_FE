@@ -1,15 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import { API_SERVER } from "./api";
 import axios from "axios";
 import { Select } from "antd";
 import { useNavigate } from "react-router-dom";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const Statistics: React.FC = () => {
-  const [selectedMetrics, setSelectedMetrics] = useState<("length" | "weight")[]>([]);
+  const [selectedMetrics, setSelectedMetrics] = useState<
+    ("length" | "weight")[]
+  >([]);
   const [showKoiList, setShowKoiList] = useState<boolean>(false);
   const [selectedKoi, setSelectedKoi] = useState<number>();
   const [selectedDuration, setSelectedDuration] = useState<string>("Last year");
@@ -19,22 +38,23 @@ const Statistics: React.FC = () => {
   const userId = localStorage.getItem("userId");
 
   const koiList: string[] = ["Koi 1", "Koi 2", "Koi 3"];
-  const durations: string[] = ["Last month", "Last 3 months", "Last 6 months", "Last year", "Since first water measure...", "Since first koi measure...", "Custom"];
+  const durations: string[] = [
+    "Last month",
+    "Last 3 months",
+    "Last 6 months",
+    "Last year",
+    "Since first water measure...",
+    "Since first koi measure...",
+    "Custom",
+  ];
 
   const navigate = useNavigate();
   useEffect(() => {
-      const role = localStorage.getItem("Role");
-      if (role !== "User" || role === null) {
-          navigate("/");
-      }
+    const role = localStorage.getItem("Role");
+    if (role !== "User" || role === null) {
+      navigate("/");
+    }
   }, []);
-
-  const growthHistory = [
-    { measurementDate: "2024-01-02", length: 20, weight: 30 },
-    { measurementDate: "2024-02-02", length: 25, weight: 35 },
-    { measurementDate: "2024-03-02", length: 30, weight: 40 },
-    // Thêm nhiều dữ liệu vào đây nếu cần
-  ];
 
   const handlePondChange = (value: any) => {
     setSelectedKoi(value);
@@ -43,11 +63,11 @@ const Statistics: React.FC = () => {
   useEffect(() => {
     const get = async () => {
       try {
-        const rs = await axios.get<any>(`${API_SERVER}api/growth-histories/koi/` + selectedKoi);
+        const rs = await axios.get<any>(
+          `${API_SERVER}api/growth-histories/koi/` + selectedKoi
+        );
         setData(rs.data.data);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
     get();
   }, [selectedKoi]);
@@ -57,9 +77,7 @@ const Statistics: React.FC = () => {
       try {
         const rs = await axios.get<any>(`${API_SERVER}api/kois/user/` + userId);
         setKois(rs.data.data);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     };
     get();
   }, []);
@@ -70,7 +88,9 @@ const Statistics: React.FC = () => {
 
   const toggleMetric = (metric: "length" | "weight") => {
     setSelectedMetrics((prev) =>
-      prev.includes(metric) ? prev.filter((m) => m !== metric) : [...prev, metric]
+      prev.includes(metric)
+        ? prev.filter((m) => m !== metric)
+        : [...prev, metric]
     );
   };
 
@@ -80,8 +100,12 @@ const Statistics: React.FC = () => {
     datasets: selectedMetrics.map((metric) => ({
       label: metric === "length" ? "Length (cm)" : "Weight (g)",
       data: data?.map((item: any) => item[metric]),
-      borderColor: metric === "length" ? "rgba(255, 99, 132, 1)" : "rgba(54, 162, 235, 1)",
-      backgroundColor: metric === "length" ? "rgba(255, 99, 132, 0.2)" : "rgba(54, 162, 235, 0.2)",
+      borderColor:
+        metric === "length" ? "rgba(255, 99, 132, 1)" : "rgba(54, 162, 235, 1)",
+      backgroundColor:
+        metric === "length"
+          ? "rgba(255, 99, 132, 0.2)"
+          : "rgba(54, 162, 235, 0.2)",
       borderWidth: 2,
       tension: 0.3,
       fill: true,
@@ -92,24 +116,24 @@ const Statistics: React.FC = () => {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: "top" as const,
       },
       title: {
         display: true,
-        text: 'Koi Growth Over Time',
+        text: "Koi Growth Over Time",
       },
     },
     scales: {
       x: {
         title: {
           display: true,
-          text: 'Date',
+          text: "Date",
         },
       },
       y: {
         title: {
           display: true,
-          text: 'Measurement',
+          text: "Measurement",
         },
       },
     },
@@ -127,9 +151,14 @@ const Statistics: React.FC = () => {
         <h1 className="text-5xl font-bold text-white">Statistics</h1>
       </div>
       <div className="text-center mt-4">
-        <p className="mt-2">Koi growth - {selectedMetrics.length > 0 ? selectedMetrics.join(", ") : "Select metric"}</p>
+        <p className="mt-2">
+          Koi growth -{" "}
+          {selectedMetrics.length > 0
+            ? selectedMetrics.join(", ")
+            : "Select metric"}
+        </p>
         <Select
-          placeholder="Select pond id"
+          placeholder="Select koi id"
           value={selectedKoi}
           onChange={handlePondChange}
           style={{ width: 200 }}
@@ -143,13 +172,21 @@ const Statistics: React.FC = () => {
 
         <div className="flex justify-center space-x-4 mt-2">
           <button
-            className={`py-1 px-4 rounded-full ${selectedMetrics.includes("length") ? "bg-orange-500 text-white" : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"}`}
+            className={`py-1 px-4 rounded-full ${
+              selectedMetrics.includes("length")
+                ? "bg-orange-500 text-white"
+                : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"
+            }`}
             onClick={() => toggleMetric("length")}
           >
             Length
           </button>
           <button
-            className={`py-1 px-4 rounded-full ${selectedMetrics.includes("weight") ? "bg-orange-500 text-white" : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"}`}
+            className={`py-1 px-4 rounded-full ${
+              selectedMetrics.includes("weight")
+                ? "bg-orange-500 text-white"
+                : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"
+            }`}
             onClick={() => toggleMetric("weight")}
           >
             Weight
