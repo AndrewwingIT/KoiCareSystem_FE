@@ -189,6 +189,7 @@ const KoiDetail: React.FC = () => {
       title: "Date",
       dataIndex: "measurementDate",
       key: "measurementDate",
+      render: (text: any) => <span>{moment(text).format("DD.MM.yyyy")}</span>,
     },
     {
       title: "Length (cm)",
@@ -230,9 +231,9 @@ const KoiDetail: React.FC = () => {
                 Purchase price:{" "}
                 {data?.price
                   ? new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(data.price)
+                    style: "currency",
+                    currency: "VND",
+                  }).format(data.price)
                   : "N/A"}
               </p>
               <p>Sex: {data?.gender}</p>
@@ -384,7 +385,11 @@ const KoiDetail: React.FC = () => {
             name="date"
             rules={[{ required: true, message: "Please select a date!" }]}
           >
-            <DatePicker format="YYYY-MM-DD" />
+            <DatePicker
+              maxDate={dayjs()}
+              className="w-full"
+              format="YYYY-MM-DD"
+            />
           </Form.Item>
           <Form.Item label="Length (cm)" name="length">
             <Input type="number" />

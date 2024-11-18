@@ -146,8 +146,8 @@ const WaterParameter: React.FC = () => {
       param.nitrate > 20 ||
       param.oxygen < 6.5 ||
       param.oxygen > 50 ||
-      param.temperature < -40 ||
-      param.temperature > 40 ||
+      param.temperature < 5 ||
+      param.temperature > 26 ||
       param.pH < 6.9 ||
       param.pH > 8 ||
       param.ammonium < 0 ||
@@ -178,7 +178,7 @@ const WaterParameter: React.FC = () => {
         isOutOfRange = param.oxygen < 6.5 || param.oxygen > 50;
         break;
       case "temperature":
-        isOutOfRange = param.temperature < -40 || param.temperature > 40;
+        isOutOfRange = param.temperature < 5 || param.temperature > 26;
         break;
       case "pH":
         isOutOfRange = param.pH < 6.9 || param.pH > 8;
@@ -299,11 +299,11 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Pond Name
-                    <Tooltip title="Select the pond where the koi is located">
+                    {/* <Tooltip title="Select the pond where the koi is located">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
-                    </Tooltip>
+                    </Tooltip> */}
                   </span>
                 }
                 name="pondId"
@@ -321,7 +321,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Temperature
-                    <Tooltip title="Enter the temperature of the pond water">
+                    <Tooltip title="Optimal range: 5 - 26 ℃">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -336,9 +336,9 @@ const WaterParameter: React.FC = () => {
                   },
                   {
                     type: "number",
-                    min: -50,
-                    max: 50,
-                    message: "Temperature value must be between -50 and 50 C",
+                    min: -40,
+                    max: 40,
+                    message: "Temperature value must be between -40 and 40 C",
                   },
                 ]}
               >
@@ -348,7 +348,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Salt
-                    <Tooltip title="Enter the salt percentage in the pond water">
+                    <Tooltip title="Optimal range: 0 - 0.1 %">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -361,8 +361,8 @@ const WaterParameter: React.FC = () => {
                   {
                     type: "number",
                     min: 0,
-                    max: 10,
-                    message: "Salt value must be between 0% and 10%",
+                    max: 1.5,
+                    message: "Salt value must be between 0% and 1.5%",
                   },
                 ]}
               >
@@ -372,7 +372,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Oxygen (O₂)
-                    <Tooltip title="Enter the oxygen concentration in the pond water">
+                    <Tooltip title="Optimal range: > 6.5 mg/L">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -386,7 +386,7 @@ const WaterParameter: React.FC = () => {
                     type: "number",
                     min: 0,
                     max: 60,
-                    message: "Oxygen value must be between 0 to 60 mg/L",
+                    message: "Oxygen value must be between 0 to 50 mg/L",
                   },
                 ]}
               >
@@ -396,7 +396,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     pH-value
-                    <Tooltip title="Enter the pH value of the pond water">
+                    <Tooltip title="Optimal range: 6.9 - 8">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -409,8 +409,8 @@ const WaterParameter: React.FC = () => {
                   {
                     type: "number",
                     min: 0,
-                    max: 50,
-                    message: "pH value must be between 0 and 50",
+                    max: 14,
+                    message: "pH value must be between 0 and 14",
                   },
                 ]}
               >
@@ -422,7 +422,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Nitrite (NO₂)
-                    <Tooltip title="Enter the nitrite concentration in the pond water">
+                    <Tooltip title="Optimal range: 0 - 0.1 mg/L">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -446,7 +446,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Nitrate (NO₃)
-                    <Tooltip title="Enter the nitrate concentration in the pond water">
+                    <Tooltip title="Optimal range: 0 - 20 mg/L">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -459,8 +459,8 @@ const WaterParameter: React.FC = () => {
                   {
                     type: "number",
                     min: 0,
-                    max: 50,
-                    message: "Nitrate value must be between 0 and 50 mg/l",
+                    max: 500,
+                    message: "Nitrate value must be between 0 and 500 mg/L",
                   },
                 ]}
               >
@@ -470,7 +470,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Phosphate (PO₃)
-                    <Tooltip title="Enter the phosphate concentration in the pond water">
+                    <Tooltip title="Optimal range: 0 - 0.035 mg/L">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -483,8 +483,8 @@ const WaterParameter: React.FC = () => {
                   {
                     type: "number",
                     min: 0,
-                    max: 10,
-                    message: "Phosphate value must be between 0 and 10 mg/l",
+                    max: 50,
+                    message: "Phosphate value must be between 0 and 50 mg/l",
                   },
                 ]}
               >
@@ -494,7 +494,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Hardness
-                    <Tooltip title="Enter the water hardness in the pond">
+                    <Tooltip title="Optimal range: 0 - 21 °dH">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -518,7 +518,7 @@ const WaterParameter: React.FC = () => {
                 label={
                   <span>
                     Ammonium (NH₄)
-                    <Tooltip title="Enter the ammonium concentration in the pond water">
+                    <Tooltip title="Optimal range: 0 - 0.1 mg/L">
                       <ExclamationCircleOutlined
                         style={{ marginLeft: 8, color: "red" }}
                       />
@@ -531,8 +531,8 @@ const WaterParameter: React.FC = () => {
                   {
                     type: "number",
                     min: 0,
-                    max: 10,
-                    message: "Ammonium value must be between 0 and 10 mg/l",
+                    max: 50,
+                    message: "Ammonium value must be between 0 and 50 mg/l",
                   },
                 ]}
               >
