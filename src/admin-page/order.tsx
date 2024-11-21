@@ -96,13 +96,6 @@ const Order: React.FC = () => {
           </Button>
           <Button
             type="primary"
-            style={{ backgroundColor: "#28a745", borderColor: "#28a745" }}
-            onClick={() => updateStatus(record, "To Pay")}
-          >
-            To Pay
-          </Button>
-          <Button
-            type="primary"
             danger
             onClick={() => updateStatus(record, "Cancel")}
           >

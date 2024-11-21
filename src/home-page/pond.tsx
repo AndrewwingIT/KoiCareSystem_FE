@@ -95,9 +95,10 @@ const Pond: React.FC = () => {
       title: "Confirm delete",
       content: "Are you sure you want to delete this pond?",
       onOk() {
-        const rs = deletePond(pond.pondId);
-        message.success("Delete successfully");
-        isLoad(true);
+        const rs = deletePond(pond.pondId).then(() => {
+          message.success("Delete successfully");
+          isLoad(true);
+        });
       },
     });
   };

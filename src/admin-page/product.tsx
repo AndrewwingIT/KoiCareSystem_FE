@@ -52,6 +52,7 @@ const Product: React.FC = () => {
     const get = async () => {
       try {
         const rs = await axios.get<any>(API_SERVER + "api/Categorys/GetAll");
+        
         setCategory(rs.data.data);
       } catch (error) {
         console.error(error);
@@ -276,7 +277,7 @@ const Product: React.FC = () => {
         <Form form={form} layout="vertical">
           <Form.Item
             name="categoryId"
-            label="Category ID"
+            label="Category"
             rules={[{ required: true, message: "Please select a category" }]}
           >
             <Select placeholder="Select a category">

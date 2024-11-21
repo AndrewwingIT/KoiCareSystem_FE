@@ -203,6 +203,12 @@ const MyKoi: React.FC = () => {
                         ? Promise.resolve()
                         : Promise.reject("Length must be greater than 0!"),
                   },
+                  {
+                    type: "number",
+                    min: 1,
+                    max: 150,
+                    message: "Length must be between 1 to 150",
+                  },
                 ]}
               >
                 <Input placeholder="Enter length" type="number" />
@@ -219,6 +225,12 @@ const MyKoi: React.FC = () => {
                       value > 0
                         ? Promise.resolve()
                         : Promise.reject("Weight must be greater than 0!"),
+                  },
+                  {
+                    type: "number",
+                    min: 0.1,
+                    max: 60000,
+                    message: "Length must be between 0.1 to 60000",
                   },
                 ]}
               >
@@ -268,6 +280,11 @@ const MyKoi: React.FC = () => {
                         ? Promise.resolve()
                         : Promise.reject("Price must be greater than 0!"),
                   },
+                  {
+                    type: "number",
+                    min: 10000,
+                    message: "Price must be higher 10000",
+                  },
                 ]}
               >
                 <Input placeholder="Enter price" type="number" />
@@ -279,7 +296,7 @@ const MyKoi: React.FC = () => {
                 name="gender"
                 rules={[{ required: true, message: "Please select gender!" }]}
               >
-                <Select placeholder="Select Sex">
+                <Select placeholder="Select Gender">
                   <Select.Option value={"Male"}>{"Male"}</Select.Option>
                   <Select.Option value={"Female"}>{"Female"}</Select.Option>
                 </Select>

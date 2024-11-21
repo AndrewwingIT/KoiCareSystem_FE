@@ -164,6 +164,9 @@ const ProductShop: React.FC = () => {
             <p style={{ margin: "0", fontWeight: "bold" }}>
               Price: {product.price.toLocaleString()} đ
             </p>
+            <p style={{ margin: "0", fontWeight: "bold" }}>
+              Quantity: {product.quantity}
+            </p>
             <div style={{ margin: "10px 0" }}>
               <button
                 onClick={(e) => {
@@ -241,11 +244,11 @@ const ProductShop: React.FC = () => {
               boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
             }}
           >
-            <h2>{selectedProduct.name}</h2>
+            <p className="text-2xl mb-2 font-bold">{selectedProduct.name}</p>
             <img
-              src={JSON.parse(selectedProduct.image)[0].thumbUrl}
+              src={selectedProduct.image}
               alt={selectedProduct.name}
-              style={{ width: "100%", height: "300px", objectFit: "cover" }}
+              style={{ width: "100%", height: "300px", objectFit: "contain" }}
             />
             <p>
               <strong>Price:</strong> {selectedProduct.price.toLocaleString()} đ

@@ -11,6 +11,7 @@ import {
   message,
   Select,
   Popconfirm,
+  InputNumber,
 } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -45,7 +46,7 @@ const KoiDetail: React.FC = () => {
   const { id } = useParams();
   const [load, setLoad] = useState(false);
   const [ponds, setPonds] = useState<any[]>([]);
-  const [imageUrl, setImageUrl] = useState();
+  const [imageFile, setImageFile] = useState(null);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -75,15 +76,22 @@ const KoiDetail: React.FC = () => {
   const handleEditOk = async () => {
     try {
       const fieldsValid = await formEdit.validateFields();
-
+      const values = formEdit.getFieldsValue();
+      values.date = moment(values.date).format("YYYY-MM-DD");
+      values.imageUrl = imageFile;
       if (fieldsValid) {
-        const values = formEdit.getFieldsValue();
-        values.imageUrl = imageUrl;
-        console.log(values);
-        await axios.put(`${API_SERVER}api/kois/${id}`, {
-          ...values,
-          date: values.date.toISOString().split("T")[0], // Format date as string (YYYY-MM-DD)
+        const formData = new FormData();
+
+        Object.keys(values).forEach((key) => {
+          formData.append(key, values[key]);
         });
+
+        const rs = await axios.put(`${API_SERVER}api/kois/${id}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data", // Ensure correct header for FormData
+          },
+        });
+
         message.success("Koi updated successfully.");
         setLoad(true);
         setEditModalVisible(false);
@@ -124,7 +132,6 @@ const KoiDetail: React.FC = () => {
       try {
         const response = await axios.get<any>(`${API_SERVER}api/kois/${id}`);
         setData(response.data.data);
-        setImageUrl(response.data.data.imageUrl);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -133,6 +140,10 @@ const KoiDetail: React.FC = () => {
     setLoad(false);
     fetchAllPonds();
   }, [load]);
+
+  const handleFileChange = (e: any) => {
+    setImageFile(e.target.files[0]);
+  };
 
   useEffect(() => {
     const get = async () => {
@@ -237,7 +248,7 @@ const KoiDetail: React.FC = () => {
                   }).format(data.price)
                   : "N/A"}
               </p>
-              <p>Sex: {data?.gender}</p>
+              <p>Gender: {data?.gender}</p>
               <p>Variety: {data?.variety}</p>
               <p>Pond: {data?.pondName}</p>
             </Col>
@@ -248,7 +259,7 @@ const KoiDetail: React.FC = () => {
                 style={{
                   width: "100%",
                   height: "150px",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   borderRadius: 8,
                 }}
               />
@@ -343,7 +354,7 @@ const KoiDetail: React.FC = () => {
             name="gender"
             rules={[{ required: true, message: "Please select gender!" }]}
           >
-            <Select placeholder="Select Sex">
+            <Select placeholder="Select Gender">
               <Select.Option value={"Male"}>{"Male"}</Select.Option>
               <Select.Option value={"Female"}>{"Female"}</Select.Option>
             </Select>
@@ -352,11 +363,11 @@ const KoiDetail: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Pond Id"
+            label="Pond"
             name="pondId"
-            rules={[{ required: true, message: "Please select a pond id!" }]}
+            rules={[{ required: true, message: "Please select a pond!" }]}
           >
-            <Select placeholder="Select pond id">
+            <Select placeholder="Select pond">
               {ponds?.map((x) => (
                 <Select.Option key={x?.pondId} value={x?.pondId}>
                   {x?.name}
@@ -364,10 +375,20 @@ const KoiDetail: React.FC = () => {
               ))}
             </Select>
           </Form.Item>
+          <Form.Item
+            name="imageUrl"
+            label="Upload Image"
+            rules={[
+              { required: true, message: "Please upload an image" },
+            ]}
+          >
+            <input type="file" name="imageURl" onChange={handleFileChange} />
+          </Form.Item>
         </Form>
       </Modal>
 
       <Modal
+        width={300}
         title="Add Growth Entry"
         visible={isAddGrowthModalVisible}
         onOk={handleAddGrowthOk}
@@ -387,11 +408,29 @@ const KoiDetail: React.FC = () => {
               required
             />
           </Form.Item>
-          <Form.Item label="Length (cm)" name="length">
-            <Input type="number" />
+          <Form.Item label="Length (cm)" name="length"
+            rules={[{ required: true, message: "Please input length!" },
+            {
+              type: "number",
+              min: 1,
+              max: 150,
+              message: "Length must be between 1 to 150",
+            },
+            ]}
+          >
+            <InputNumber className="w-full" type="number" />
           </Form.Item>
-          <Form.Item label="Weight (g)" name="weight">
-            <Input type="number" />
+          <Form.Item label="Weight (g)" name="weight"
+            rules={[{ required: true, message: "Please input weight!" },
+            {
+              type: "number",
+              min: 0.1,
+              max: 60000,
+              message: "Weight must be between 0.1 to 60000",
+            },
+            ]}
+          >
+            <InputNumber className="w-full" type="number" />
           </Form.Item>
         </Form>
       </Modal>

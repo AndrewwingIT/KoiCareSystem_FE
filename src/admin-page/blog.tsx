@@ -237,7 +237,7 @@ const BlogManagment: React.FC = () => {
                         name="title"
                         label="Title"
                         rules={[
-                            { required: true, message: "Please enter the Blog name" },
+                            { required: true, message: "Please enter the title" },
                         ]}
                     >
                         <Input />
@@ -246,7 +246,7 @@ const BlogManagment: React.FC = () => {
                         name="content"
                         label="Content"
                         rules={[
-                            { required: true, message: "Please enter the description" },
+                            { required: true, message: "Please enter the content" },
                         ]}
                     >
                         <Input />
@@ -255,7 +255,7 @@ const BlogManagment: React.FC = () => {
                         name="author"
                         label="Author"
                         rules={[
-                            { required: true, message: "Please enter the price" },
+                            { required: true, message: "Please enter the author" },
                         ]}
                     >
                         <Input className="w-full" />

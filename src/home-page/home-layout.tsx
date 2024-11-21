@@ -5,6 +5,7 @@ import {
   CalculatorOutlined,
   DropboxOutlined,
   HeartOutlined,
+  PicLeftOutlined,
   PlusSquareOutlined,
   ProductOutlined,
 } from "@ant-design/icons";
@@ -41,7 +42,7 @@ const items: MenuItem[] = [
   getItem("Statistics", "/statistics", <AreaChartOutlined />),
   getItem("Product", "/product", <ProductOutlined />),
   getItem("Order", "/order", <DropboxOutlined />),
-  getItem("Blog", "/blog", <DropboxOutlined />),
+  getItem("Blog", "/blog", <PicLeftOutlined />),
 ];
 
 const HomeLayout: React.FC = () => {

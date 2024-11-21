@@ -25,10 +25,10 @@ const SaltCalculator: React.FC = () => {
   };
 
   const handleConcentrationChange = (value: number) => {
-    if (value >= 1 && value <= 2) {
+    if (value >= 0.1 && value <= 2) {
       setConcentration(value);
     } else {
-      message.warning("Please enter a concentration between 1% and 2%");
+      message.warning("Please enter a concentration between 0.1% and 2%");
     }
   };
 
@@ -55,7 +55,7 @@ const SaltCalculator: React.FC = () => {
         <Form.Item label="Desired Salt Concentration (%)">
           <Input
             type="number"
-            placeholder="Enter salt concentration (1-2%)"
+            placeholder="Enter salt concentration (0.1-2%)"
             value={concentration}
             onChange={(e) => handleConcentrationChange(Number(e.target.value))}
           />

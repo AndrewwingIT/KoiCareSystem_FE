@@ -89,6 +89,7 @@ const User: React.FC = () => {
   const handleDelete = async (userId: number) => {
     try {
       const rs = await axios.delete<any>(API_SERVER + "api/users/" + userId);
+      message.success("User inactive successfully!");
     } catch (error) {
       console.error(error);
     } finally {
@@ -209,24 +210,24 @@ const User: React.FC = () => {
             >
               Edit
             </Button>
-            <Popconfirm
-              title="Are you sure to delete this user?"
-              onConfirm={() => handleDelete(record.userId)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button type="default" danger>
-                Delete
-              </Button>
-            </Popconfirm>
             <Button
-              className="ml-2"
+              className="mr-2"
               type="primary"
               style={{ backgroundColor: "#28a745", borderColor: "#28a745" }}
               onClick={() => handleActive(record.userId)}
             >
               Active
             </Button>
+            <Popconfirm
+              title="Are you sure to inactive this user?"
+              onConfirm={() => handleDelete(record.userId)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="default" className="!bg-yellow-500 text-white">
+                Inactive
+              </Button>
+            </Popconfirm>
           </>
         );
       },

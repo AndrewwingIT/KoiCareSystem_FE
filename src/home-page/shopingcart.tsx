@@ -59,7 +59,7 @@ const ShoppingCart: React.FC = () => {
       userId: userId, // Get this from the logged-in user context
       date: new Date().toISOString().split("T")[0], // Format as 'yyyy-MM-dd'
       totalPrice: totalAmount,
-      status: "ToPay", // Set the initial status
+      status: "To Pay", // Set the initial status
       orderDetails: orderDetails,
     };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   DesktopOutlined,
   DropboxOutlined,
+  PicLeftOutlined,
   PieChartOutlined,
   ProductOutlined,
   UserOutlined,
@@ -35,7 +36,7 @@ const items: MenuItem[] = [
   getItem("Category", "category", <PieChartOutlined />),
   getItem("User", "user", <UserOutlined />),
   getItem("Order", "order", <DropboxOutlined />),
-  getItem("Blog", "blog", <DropboxOutlined />),
+  getItem("Blog", "blog", <PicLeftOutlined />),
 ];
 
 const AdminLayout: React.FC = () => {
