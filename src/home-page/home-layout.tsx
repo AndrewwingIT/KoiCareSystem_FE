@@ -41,6 +41,7 @@ const items: MenuItem[] = [
   getItem("Statistics", "/statistics", <AreaChartOutlined />),
   getItem("Product", "/product", <ProductOutlined />),
   getItem("Order", "/order", <DropboxOutlined />),
+  getItem("Blog", "/blog", <DropboxOutlined />),
 ];
 
 const HomeLayout: React.FC = () => {

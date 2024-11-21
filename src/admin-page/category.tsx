@@ -89,7 +89,7 @@ const Category: React.FC = () => {
           ...newCategory,
           categoryId: 0,
         });
-      } catch (error) {}
+      } catch (error) { }
       setLoad(true);
       setIsModalOpen(false);
     } catch (errInfo) {
@@ -144,6 +144,7 @@ const Category: React.FC = () => {
     {
       title: "Action",
       key: "action",
+      width: "15%",
       render: (_: any, record: CategoryData) => {
         const editable = isEditing(record);
         return editable ? (

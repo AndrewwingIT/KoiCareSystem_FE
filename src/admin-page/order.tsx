@@ -81,8 +81,8 @@ const Order: React.FC = () => {
           status === "Pending"
             ? "orange"
             : status === "To Pay"
-            ? "green"
-            : "red";
+              ? "green"
+              : "red";
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -127,9 +127,31 @@ const Order: React.FC = () => {
 
   const columnsDetail = [
     {
-      title: "Product ID",
-      dataIndex: "productId",
-      key: "productId",
+      title: "Product Name",
+      dataIndex: "productName",
+      key: "productName",
+    },
+    {
+      title: "Product Image",
+      dataIndex: "image",
+      key: "image",
+      render: (imageUrl: string) => {
+        if (imageUrl) {
+          return (
+            <img
+              src={imageUrl}
+              alt="Product"
+              style={{
+                width: 50,
+                height: 50,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+            />
+          );
+        }
+        return <span>No image</span>;
+      }
     },
     {
       title: "Quantity",
@@ -143,7 +165,6 @@ const Order: React.FC = () => {
       render: (price: number) => price.toLocaleString(), // Định dạng số thành chuỗi
     },
   ];
-
   return (
     <div style={{ padding: "20px" }}>
       <Title level={2}>Order List</Title>

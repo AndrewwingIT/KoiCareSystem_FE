@@ -37,6 +37,8 @@ const Product: React.FC = () => {
   const [data, setData] = useState<ProductData[]>([]);
   const [category, setCategory] = useState<any[]>([]);
   const [load, setLoad] = useState<boolean>(false);
+  const [imageUrl, setImageUrl] = useState("");
+
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -58,6 +60,10 @@ const Product: React.FC = () => {
     get();
   }, []);
 
+  const handleFileChange = (e: any) => {
+    setImageUrl(e.target.files[0]);
+  };
+
   useEffect(() => {
     const get = async () => {
       try {
@@ -74,31 +80,11 @@ const Product: React.FC = () => {
   // Open modal for editing
   const handleEdit = (product: ProductData) => {
     setIsEditing(true);
-    let parsedImage;
-    try {
-      parsedImage = JSON.parse(product.image);
-    } catch (error) {
-      parsedImage = [
-        {
-          uid: "rc-upload-default-1",
-          lastModified: Date.now(),
-          lastModifiedDate: new Date().toISOString(),
-          name: "default-image.jpg",
-          size: 0,
-          type: "image/jpeg",
-          percent: 0,
-          originFileObj: {
-            uid: "rc-upload-default-1",
-          },
-          thumbUrl: "data:image/png;base64,iVBmRyRsKGBxuqDIT", // This is a base64-encoded image placeholder
-        },
-      ];
-    }
-    console.log(parsedImage);
-    setEditingProduct({ ...product, image: parsedImage });
+
+    setEditingProduct({ ...product, image: "" });
     form.setFieldsValue({
       ...product,
-      image: parsedImage,
+      image: "",
     });
     setIsModalOpen(true);
   };
@@ -112,39 +98,67 @@ const Product: React.FC = () => {
   };
 
   // Handle delete action
-  const handleDelete = (productId: number) => {
-    const newData = data.filter((product) => product.productId !== productId);
-    setData(newData);
-    message.success(`Deleted product with ID: ${productId}`);
+  const handleDelete = async (productId: number) => {
+    try {
+      const rs = await axios.delete(API_SERVER + "api/Products/" + productId);
+      setLoad(true);
+      message.success(`Deleted product successfully`);
+    } catch (error) {
+      console.error(error);
+    }
+
   };
 
   // Save new or edited product
   const saveProduct = async () => {
     try {
       const values = await form.validateFields();
-      const stringData = JSON.stringify(values.image);
 
-      if (isEditing && editingProduct) {
+      if (editingProduct !== null) {
         // Update existing product
         try {
-          const rs = await axios.put(API_SERVER + "api/Products", {
-            ...values,
-            productId: editingProduct.productId,
-            image: stringData,
+          const formData = new FormData();
+
+          // Append each field in `values` to the FormData object
+          Object.keys(values).forEach((key) => {
+            formData.append(key, values[key]);
           });
+
+          // Append the productId separately
+          formData.append("productId", editingProduct.productId.toString());
+
+          formData.append("image", imageUrl);
+
+          const rs = await axios.put(API_SERVER + "api/Products", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data", // Ensure correct header for FormData
+            },
+          });
+
           message.success("Product updated successfully!");
         } catch (error) {
-          console.error(error);
+          console.error("Error updating product:", error);
         }
       } else {
-        // Add new product
-        const newProduct = {
-          ...values,
-          productId: 0,
-          image: stringData,
-        }; // Mock ID for new product
         try {
-          const rs = await axios.post(API_SERVER + "api/Products", newProduct);
+          const formData = new FormData();
+
+          // Append each field in `values` to the FormData object
+          Object.keys(values).forEach((key) => {
+            formData.append(key, values[key]);
+          });
+
+          // Append the productId separately
+          formData.append("productId", "0");
+
+          // If you have a file (e.g., `imageFile`), append it as well
+          formData.append("image", imageUrl);
+
+          const rs = await axios.post(API_SERVER + "api/Products", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data", // Ensure correct header for FormData
+            },
+          });
         } catch (error) {
           console.error(error);
         }
@@ -194,32 +208,27 @@ const Product: React.FC = () => {
       dataIndex: "image",
       key: "image",
       render: (imageUrl: string) => {
-        try {
-          const parsedImage = JSON.parse(imageUrl);
-          if (Array.isArray(parsedImage) && parsedImage.length > 0) {
-            return (
-              <img
-                src={parsedImage[0].thumbUrl}
-                alt="Product"
-                style={{
-                  width: 50,
-                  height: 50,
-                  objectFit: "cover",
-                  borderRadius: 4,
-                }}
-              />
-            );
-          }
-          return <span>No image</span>;
-        } catch (error) {
-          console.error("Invalid JSON for image:", error);
-          return <span>Invalid image</span>;
+        if (imageUrl) {
+          return (
+            <img
+              src={imageUrl}
+              alt="Product"
+              style={{
+                width: 50,
+                height: 50,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+            />
+          );
         }
-      },
+        return <span>No image</span>;
+      }
     },
     {
       title: "Action",
       key: "action",
+      width: "15%",
       render: (_: any, record: ProductData) => (
         <>
           <Button
@@ -327,22 +336,8 @@ const Product: React.FC = () => {
           <Form.Item
             name="image"
             label="Upload Image"
-            valuePropName="fileList"
-            getValueFromEvent={(e) => {
-              if (Array.isArray(e)) {
-                return e;
-              }
-              return e?.fileList;
-            }}
-            rules={[{ required: true, message: "Please upload an image" }]}
           >
-            <Upload
-              name="image"
-              listType="picture"
-              beforeUpload={() => false} // Prevent automatic upload
-            >
-              <Button>Click to Upload</Button>
-            </Upload>
+            <input type="file" name="imageURl" onChange={handleFileChange} />
           </Form.Item>
         </Form>
       </Modal>

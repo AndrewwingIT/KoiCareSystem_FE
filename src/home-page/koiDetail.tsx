@@ -43,7 +43,7 @@ const KoiDetail: React.FC = () => {
   const [data, setData] = useState<any>();
   const [growthHistory, setGrowthHistory] = useState<any[]>([]);
   const { id } = useParams();
-  const [lóad, setLoad] = useState(false);
+  const [load, setLoad] = useState(false);
   const [ponds, setPonds] = useState<any[]>([]);
   const [imageUrl, setImageUrl] = useState();
 
@@ -132,7 +132,7 @@ const KoiDetail: React.FC = () => {
     getKoiData();
     setLoad(false);
     fetchAllPonds();
-  }, [lóad]);
+  }, [load]);
 
   useEffect(() => {
     const get = async () => {
@@ -153,16 +153,17 @@ const KoiDetail: React.FC = () => {
   };
 
   const handleAddGrowthOk = async () => {
-    const growthValues = formGrowth.getFieldsValue();
-    const newGrowth = {
-      measurementDate: growthValues.date.format("YYYY-MM-DD"),
-      length: growthValues.length,
-      weight: growthValues.weight,
-      physique: 1,
-      koiId: 0,
-    };
-
     try {
+      await formGrowth.validateFields();
+      const growthValues = formGrowth.getFieldsValue();
+      const newGrowth = {
+        measurementDate: growthValues?.date?.format("YYYY-MM-DD"),
+        length: growthValues.length,
+        weight: growthValues.weight,
+        physique: 1,
+        koiId: 0,
+      };
+
       const response = await axios.post(`${API_SERVER}api/growth-histories`, {
         koiId: id,
         physique: "1",
@@ -238,18 +239,11 @@ const KoiDetail: React.FC = () => {
               </p>
               <p>Sex: {data?.gender}</p>
               <p>Variety: {data?.variety}</p>
-              <p>Pond: {data?.pondId}</p>
+              <p>Pond: {data?.pondName}</p>
             </Col>
             <Col span={12}>
               <img
-                src={(() => {
-                  try {
-                    const parsedImage = JSON.parse(data.imageUrl);
-                    return parsedImage[0]?.thumbUrl || "";
-                  } catch (error) {
-                    return "";
-                  }
-                })()}
+                src={data?.imageUrl}
                 alt={data?.name}
                 style={{
                   width: "100%",
@@ -384,11 +378,13 @@ const KoiDetail: React.FC = () => {
             label="Date"
             name="date"
             rules={[{ required: true, message: "Please select a date!" }]}
+            validateTrigger="onBlur"
           >
             <DatePicker
               maxDate={dayjs()}
               className="w-full"
               format="YYYY-MM-DD"
+              required
             />
           </Form.Item>
           <Form.Item label="Length (cm)" name="length">

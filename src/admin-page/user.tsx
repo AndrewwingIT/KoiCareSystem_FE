@@ -13,18 +13,6 @@ interface UserData {
   address: string;
 }
 
-const listData: UserData[] = [
-  {
-    userId: 2,
-    name: "Staff1",
-    email: "staff@example.com",
-    password:
-      "15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225",
-    phone: "123456789",
-    address: "KoiCareFacility",
-  },
-];
-
 const User: React.FC = () => {
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [form] = Form.useForm();
@@ -77,6 +65,16 @@ const User: React.FC = () => {
       const newData = data.map((item: any) =>
         item.userId === userId ? { ...item, ...updatedUser } : item
       );
+      try {
+        const rs = await axios.put<any>(
+          API_SERVER + "api/users/" + userId, updatedUser
+        );
+        setData(rs.data.data.listData);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoad(false);
+      }
       setData(newData);
       setEditingUserId(null);
       message.success("User updated successfully!");
@@ -137,22 +135,6 @@ const User: React.FC = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (_: any, record: UserData) => {
-        return isEditing(record) ? (
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: "Please enter user email!" },
-              { type: "email", message: "Please enter a valid email!" },
-            ]}
-            style={{ margin: 0 }}
-          >
-            <Input />
-          </Form.Item>
-        ) : (
-          record.email
-        );
-      },
     },
     {
       title: "Phone",

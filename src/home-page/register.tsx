@@ -20,7 +20,7 @@ const Register: React.FC = () => {
     rs.then((result) => {
       console.log("Result:", result);
       message.success(result.message);
-      navigate("/login");
+      navigate("/");
     }).catch((error) => {
       console.error("Caught Error in onFinish:", error.response.data);
       message.error(error.response.data);
@@ -114,7 +114,7 @@ const Register: React.FC = () => {
               </Button>
             </Form.Item>
             <div className="text-center">
-              <Link to={"/login"}>Already a member? Login here</Link>
+              <Link to={"/"}>Already a member? Login here</Link>
             </div>
           </Form>
         </Card>

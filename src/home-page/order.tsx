@@ -48,11 +48,6 @@ const OrderTable: React.FC = () => {
       key: "orderId",
     },
     {
-      title: "User ID",
-      dataIndex: "userId",
-      key: "userId",
-    },
-    {
       title: "Date",
       dataIndex: "date",
       key: "date",
@@ -73,8 +68,8 @@ const OrderTable: React.FC = () => {
           status === "Pending"
             ? "orange"
             : status === "To Pay"
-            ? "green"
-            : "red";
+              ? "green"
+              : "red";
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -93,9 +88,31 @@ const OrderTable: React.FC = () => {
 
   const columnsDetail = [
     {
-      title: "Product ID",
-      dataIndex: "productId",
-      key: "productId",
+      title: "Product Name",
+      dataIndex: "productName",
+      key: "productName",
+    },
+    {
+      title: "Product Image",
+      dataIndex: "image",
+      key: "image",
+      render: (imageUrl: string) => {
+        if (imageUrl) {
+          return (
+            <img
+              src={imageUrl}
+              alt="Product"
+              style={{
+                width: 50,
+                height: 50,
+                objectFit: "cover",
+                borderRadius: 4,
+              }}
+            />
+          );
+        }
+        return <span>No image</span>;
+      }
     },
     {
       title: "Quantity",

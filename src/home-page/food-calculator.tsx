@@ -101,7 +101,7 @@ const FoodCalculator: React.FC = () => {
                 <h1 className="food-calculator-title text-3xl font-semibold text-center mb-4 text-orange-600">Food Calculator</h1>
                 <div className="food-calculator-pond-info text-center mb-4">
                     <Select
-                        placeholder="Select pond id"
+                        placeholder="Select pond"
                         value={selectedPondId}
                         onChange={handlePondChange}
                         style={{ width: 200 }}

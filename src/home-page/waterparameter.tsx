@@ -264,7 +264,7 @@ const WaterParameter: React.FC = () => {
                   Temperature: <span>{param.temperature}</span>
                 </p>
                 <p style={getParameterStyle(param, "pH")}>
-                  pH-value: <span>{param.pH}</span>
+                  pH-value: <span>{param.ph}</span>
                 </p>
                 <p style={getParameterStyle(param, "ammonium")}>
                   Ammonium (NH₄): <span>{param.ammonium}</span>

@@ -9,8 +9,9 @@ import {
   Col,
   Select,
   Upload,
+  message,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addKoi, API_SERVER, getAllPonds } from "./api";
@@ -25,6 +26,7 @@ const MyKoi: React.FC = () => {
   const [Load, isLoad] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     const role = localStorage.getItem("Role");
@@ -38,7 +40,11 @@ const MyKoi: React.FC = () => {
     const rs = getAllPonds(userId);
     rs.then((x) => {
       setPonds(x.data);
-    }).catch((error) => {});
+    }).catch((error) => { });
+  };
+
+  const handleFileChange = (e: any) => {
+    setImageFile(e.target.files[0]);
   };
 
   useEffect(() => {
@@ -51,10 +57,8 @@ const MyKoi: React.FC = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      const stringData = JSON.stringify(values.image);
-      values.image = stringData;
+      values.image = imageFile;
 
-      isLoad(true); // Đặt trạng thái tải lên là true
 
       await addKoi(values);
 
@@ -62,7 +66,7 @@ const MyKoi: React.FC = () => {
       form.resetFields();
     } catch (error) {
     } finally {
-      isLoad(false); // Đặt lại trạng thái tải lên
+      isLoad(true); // Đặt lại trạng thái tải lên
     }
   };
 
@@ -76,7 +80,7 @@ const MyKoi: React.FC = () => {
       try {
         const rs = await axios.get<any>(`${API_SERVER}api/kois/user/` + userId);
         setData(rs.data.data);
-      } catch (error) {}
+      } catch (error) { }
     };
     get();
     isLoad(false);
@@ -111,14 +115,7 @@ const MyKoi: React.FC = () => {
                   <Row gutter={16}>
                     <Col span={12}>
                       <img
-                        src={(() => {
-                          try {
-                            const parsedImage = JSON.parse(koi.imageUrl);
-                            return parsedImage[0]?.thumbUrl || "";
-                          } catch (error) {
-                            return "";
-                          }
-                        })()}
+                        src={koi?.imageUrl}
                         alt={koi?.name}
                         style={{
                           width: "100%",
@@ -231,13 +228,13 @@ const MyKoi: React.FC = () => {
 
             <Col span={12}>
               <Form.Item
-                label="Pond Id"
+                label="Pond "
                 name="pondId"
                 rules={[
-                  { required: true, message: "Please select a pond id!" },
+                  { required: true, message: "Please select a pond !" },
                 ]}
               >
-                <Select placeholder="Select pond id">
+                <Select placeholder="Select pond ">
                   {ponds?.map((x) => (
                     <Select.Option key={x?.pondId} value={x?.pondId}>
                       {x?.name}
@@ -299,13 +296,13 @@ const MyKoi: React.FC = () => {
             </Col>
             <Col span={12}>
               <Form.Item
-                label="Physiqueld"
+                label="Physique"
                 name="physiqueld"
                 rules={[
-                  { required: true, message: "Please select a pond id!" },
+                  { required: true, message: "Please select a Physique!" },
                 ]}
               >
-                <Select placeholder="Select physiqueld">
+                <Select placeholder="Select physique">
                   <Select.Option value={1}>{"Slim"}</Select.Option>
                   <Select.Option value={2}>{"Normal"}</Select.Option>
                   <Select.Option value={3}>{"Corpulent"}</Select.Option>
@@ -316,22 +313,11 @@ const MyKoi: React.FC = () => {
               <Form.Item
                 name="image"
                 label="Upload Image"
-                valuePropName="fileList"
-                getValueFromEvent={(e) => {
-                  if (Array.isArray(e)) {
-                    return e;
-                  }
-                  return e?.fileList;
-                }}
-                rules={[{ required: true, message: "Please upload an image" }]}
+                rules={[
+                  { required: true, message: "Please upload an image" },
+                ]}
               >
-                <Upload
-                  name="image"
-                  listType="picture"
-                  beforeUpload={() => false} // Prevent automatic upload
-                >
-                  <Button>Click to Upload</Button>
-                </Upload>
+                <input type="file" name="imageURl" onChange={handleFileChange} />
               </Form.Item>
             </Col>
           </Row>

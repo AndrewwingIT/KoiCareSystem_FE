@@ -14,6 +14,8 @@ import { API_SERVER } from "./api";
 import axios from "axios";
 import { Select } from "antd";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
+import { render } from "@testing-library/react";
 
 ChartJS.register(
   CategoryScale,
@@ -67,7 +69,7 @@ const Statistics: React.FC = () => {
           `${API_SERVER}api/growth-histories/koi/` + selectedKoi
         );
         setData(rs.data.data);
-      } catch (error) {}
+      } catch (error) { }
     };
     get();
   }, [selectedKoi]);
@@ -77,7 +79,7 @@ const Statistics: React.FC = () => {
       try {
         const rs = await axios.get<any>(`${API_SERVER}api/kois/user/` + userId);
         setKois(rs.data.data);
-      } catch (error) {}
+      } catch (error) { }
     };
     get();
   }, []);
@@ -96,7 +98,7 @@ const Statistics: React.FC = () => {
 
   // Dữ liệu biểu đồ dựa trên các metric đã chọn
   const chartData = {
-    labels: data?.map((item: any) => item.measurementDate),
+    labels: data?.map((item: any) => moment(item.measurementDate).format("DD.MM.YYYY")),
     datasets: selectedMetrics.map((metric) => ({
       label: metric === "length" ? "Length (cm)" : "Weight (g)",
       data: data?.map((item: any) => item[metric]),
@@ -158,7 +160,7 @@ const Statistics: React.FC = () => {
             : "Select metric"}
         </p>
         <Select
-          placeholder="Select koi id"
+          placeholder="Select koi"
           value={selectedKoi}
           onChange={handlePondChange}
           style={{ width: 200 }}
@@ -172,21 +174,19 @@ const Statistics: React.FC = () => {
 
         <div className="flex justify-center space-x-4 mt-2">
           <button
-            className={`py-1 px-4 rounded-full ${
-              selectedMetrics.includes("length")
-                ? "bg-orange-500 text-white"
-                : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"
-            }`}
+            className={`py-1 px-4 rounded-full ${selectedMetrics.includes("length")
+              ? "bg-orange-500 text-white"
+              : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"
+              }`}
             onClick={() => toggleMetric("length")}
           >
             Length
           </button>
           <button
-            className={`py-1 px-4 rounded-full ${
-              selectedMetrics.includes("weight")
-                ? "bg-orange-500 text-white"
-                : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"
-            }`}
+            className={`py-1 px-4 rounded-full ${selectedMetrics.includes("weight")
+              ? "bg-orange-500 text-white"
+              : "border border-orange-500 text-orange-500 bg-white hover:bg-orange-100"
+              }`}
             onClick={() => toggleMetric("weight")}
           >
             Weight

@@ -1,4 +1,4 @@
-import { Button, Form, Modal, Input, Row, Col, Card, message } from "antd";
+import { Button, Form, Modal, Input, Row, Col, Card, message, InputNumber } from "antd";
 import React, { useState, useEffect } from "react";
 import { PlusOutlined } from "@ant-design/icons";
 import { createPond, deletePond, getAllPonds, updatePond } from "./api";
@@ -57,7 +57,7 @@ const Pond: React.FC = () => {
     form.validateFields().then(async (values) => {
       const rawUserId = localStorage.getItem("userId");
       const userId = rawUserId !== null ? parseInt(rawUserId, 10) : undefined;
-      isLoad(true);
+
 
       const dataFormat = {
         userId: userId,
@@ -76,9 +76,12 @@ const Pond: React.FC = () => {
         const response = await createPond(dataFormat);
         message.success(response.message);
       }
-      fetchAllPonds();
+      isLoad(true);
       setIsModalOpen(false);
       form.resetFields();
+
+    }).catch((errorInfo) => {
+      console.error("Validation Failed:", errorInfo); // Debug thông tin lỗi
     });
   };
 
@@ -95,7 +98,6 @@ const Pond: React.FC = () => {
         const rs = deletePond(pond.pondId);
         message.success("Delete successfully");
         isLoad(true);
-        fetchAllPonds();
       },
     });
   };
@@ -167,18 +169,18 @@ const Pond: React.FC = () => {
         <Form layout="vertical" form={form}>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Pond Id" name="pondId">
-                <Input
-                  placeholder="Enter pond id"
-                  disabled // ở mode edit hoặc mode add thì làm mờ form --> auto disabled
-                />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
               <Form.Item
                 label="Name"
                 name="name"
-                rules={[{ required: true, message: "Please enter pond name!" }]}
+                rules={[
+                  { required: true, message: "Please enter pond name!" },
+                  {
+                    type: "string",
+                    min: 0,
+                    max: 100,
+                    message: "Pond name can't be longer than 100 characters.",
+                  },
+                ]}
               >
                 <Input placeholder="Enter pond name" />
               </Form.Item>
@@ -193,6 +195,12 @@ const Pond: React.FC = () => {
                     message: "Please input the volume!",
                   },
                   {
+                    type: "number",
+                    min: 0,
+                    max: 1000000,
+                    message: "Volume must be between 0 to 1000000",
+                  },
+                  {
                     validator: (_, value) => {
                       if (!value || value <= 0) {
                         return Promise.reject(
@@ -204,7 +212,7 @@ const Pond: React.FC = () => {
                   },
                 ]}
               >
-                <Input placeholder="Enter volume in liters" type="number" />
+                <InputNumber className="w-full" placeholder="Enter volume in liters" type="number" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -223,9 +231,15 @@ const Pond: React.FC = () => {
                       return Promise.resolve();
                     },
                   },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 100,
+                    message: "Depth must be between 0 to 100",
+                  },
                 ]}
               >
-                <Input placeholder="Enter depth in meters" type="number" />
+                <InputNumber className="w-full" placeholder="Enter depth in meters" type="number" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -244,9 +258,15 @@ const Pond: React.FC = () => {
                       return Promise.resolve();
                     },
                   },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 20,
+                    message: "Drain count must be between 0 to 20",
+                  },
                 ]}
               >
-                <Input placeholder="Enter drain count" type="number" />
+                <InputNumber className="w-full" placeholder="Enter drain count" type="number" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -265,9 +285,15 @@ const Pond: React.FC = () => {
                       return Promise.resolve();
                     },
                   },
+                  {
+                    type: "number",
+                    min: 0,
+                    max: 1000000,
+                    message: "Pump capacity must be between 0 to 1000000",
+                  },
                 ]}
               >
-                <Input placeholder="Enter pumping capacity" type="number" />
+                <InputNumber className="w-full" placeholder="Enter pumping capacity" type="number" />
               </Form.Item>
             </Col>
           </Row>

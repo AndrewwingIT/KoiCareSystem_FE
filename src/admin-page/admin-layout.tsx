@@ -35,6 +35,7 @@ const items: MenuItem[] = [
   getItem("Category", "category", <PieChartOutlined />),
   getItem("User", "user", <UserOutlined />),
   getItem("Order", "order", <DropboxOutlined />),
+  getItem("Blog", "blog", <DropboxOutlined />),
 ];
 
 const AdminLayout: React.FC = () => {

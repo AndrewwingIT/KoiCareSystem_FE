@@ -156,14 +156,7 @@ const ProductShop: React.FC = () => {
             onClick={() => openProductDetails(product)} // Open product details when clicked
           >
             <img
-              src={(() => {
-                try {
-                  const parsedImage = JSON.parse(product.image);
-                  return parsedImage[0]?.thumbUrl || "";
-                } catch (error) {
-                  return "";
-                }
-              })()}
+              src={product.image}
               alt={product.name}
               style={{ width: "100%", height: "150px", objectFit: "cover" }}
             />

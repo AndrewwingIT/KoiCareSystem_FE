@@ -134,23 +134,35 @@ export const register = async (
 export const addKoi = async (value: any) => {
   console.log(value);
   try {
-    const rs = await axios.post(`${API_SERVER}api/kois`, {
-      pondId: value.pondId,
-      physiqueId: value.physiqueld, // Required
-      name: value.Name, // Required
-      age: value.age, // Optional, defaults to an empty value
-      length: value.length, // Required
-      weight: value.weight, // Required
-      gender: value.gender, // Opvtional, defaults to an empty value
-      variety: value.variety, // Optional, defaults to an empty value
-      date: value.inPondSince.toISOString().split("T")[0], // Optional, defaults to an empty value (format: "YYYY-MM-DD")
-      price: value.purchasePrice, // Optional, defaults to an empty value
-      imageURl: value.image,
+    const formData = new FormData();
+
+    // Append all form fields
+    formData.append('pondId', value.pondId);
+    formData.append('physiqueId', value.physiqueld);
+    formData.append('name', value.Name);
+    formData.append('age', value.age);
+    formData.append('length', value.length);
+    formData.append('weight', value.weight);
+    formData.append('gender', value.gender);
+    formData.append('variety', value.variety);
+    formData.append('date', value.inPondSince.toISOString().split("T")[0]);
+    formData.append('price', value.purchasePrice);
+
+    console.log(value.image);
+    // Append image file
+    formData.append('ImageURL', value.image);
+
+    const rs = await axios.post(`${API_SERVER}api/kois`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     });
+
     console.log(rs.data);
     return rs.data;
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 

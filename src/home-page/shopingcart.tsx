@@ -59,7 +59,7 @@ const ShoppingCart: React.FC = () => {
       userId: userId, // Get this from the logged-in user context
       date: new Date().toISOString().split("T")[0], // Format as 'yyyy-MM-dd'
       totalPrice: totalAmount,
-      status: "Pending", // Set the initial status
+      status: "ToPay", // Set the initial status
       orderDetails: orderDetails,
     };
 
@@ -119,14 +119,7 @@ const ShoppingCart: React.FC = () => {
             >
               <div style={{ display: "flex", alignItems: "center" }}>
                 <img
-                  src={(() => {
-                    try {
-                      const parsedImage = JSON.parse(item.product.image);
-                      return parsedImage[0]?.thumbUrl || "";
-                    } catch (error) {
-                      return "";
-                    }
-                  })()}
+                  src={item.product.image}
                   alt={item.product.name}
                   style={{
                     width: "50px",

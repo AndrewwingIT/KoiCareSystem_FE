@@ -18,6 +18,8 @@ import Statistics from "./home-page/statistic";
 import FoodCalculator from "./home-page/food-calculator";
 import Order from "./admin-page/order";
 import OrderTable from "./home-page/order";
+import BlogManager from "./admin-page/blog";
+import BlogPage from "./home-page/blog";
 
 function App() {
   return (
@@ -29,6 +31,7 @@ function App() {
         <Route path="product" element={<Product />}></Route>
         <Route path="category" element={<Category />}></Route>
         <Route path="order" element={<Order />}></Route>
+        <Route path="blog" element={<BlogManager />}></Route>
       </Route>
       <Route path="/" element={<HomeLayout />}>
         <Route path="my-koi" element={<MyKoi />}></Route>
@@ -41,6 +44,7 @@ function App() {
         <Route path="water-parameter" element={<WaterParameter />}></Route>
         <Route path="statistics" element={<Statistics />}></Route>
         <Route path="order" element={<OrderTable />}></Route>
+        <Route path="blog" element={<BlogPage />}></Route>
       </Route>
     </Routes>
   );
