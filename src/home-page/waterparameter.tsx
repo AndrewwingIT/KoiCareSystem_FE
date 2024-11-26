@@ -464,7 +464,7 @@ const WaterParameter: React.FC = () => {
                   },
                 ]}
               >
-                <InputNumber className="w-full" step={1} />
+                <InputNumber className="w-full" step={0.1} />
               </Form.Item>
               <Form.Item
                 label={
@@ -512,7 +512,7 @@ const WaterParameter: React.FC = () => {
                   },
                 ]}
               >
-                <InputNumber className="w-full" step={1} />
+                <InputNumber className="w-full" step={0.1} />
               </Form.Item>
               <Form.Item
                 label={

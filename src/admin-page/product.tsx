@@ -52,7 +52,7 @@ const Product: React.FC = () => {
     const get = async () => {
       try {
         const rs = await axios.get<any>(API_SERVER + "api/Categorys/GetAll");
-        
+
         setCategory(rs.data.data);
       } catch (error) {
         console.error(error);
@@ -188,7 +188,7 @@ const Product: React.FC = () => {
       dataIndex: "categoryId",
       key: "categoryId",
       render: (value: any) => (
-        <>{category.find((x) => x.categoryId === value).name}</>
+        <>{category?.find((x) => x?.categoryId === value)?.name}</>
       ),
     },
     { title: "Name", dataIndex: "name", key: "name" },

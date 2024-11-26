@@ -10,6 +10,7 @@ import {
   Select,
   Upload,
   message,
+  InputNumber,
 } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
@@ -211,7 +212,7 @@ const MyKoi: React.FC = () => {
                   },
                 ]}
               >
-                <Input placeholder="Enter length" type="number" />
+                <InputNumber className="w-full" placeholder="Enter length" type="number" />
               </Form.Item>
             </Col>
             <Col span={12}>
@@ -234,7 +235,7 @@ const MyKoi: React.FC = () => {
                   },
                 ]}
               >
-                <Input placeholder="Enter weight" type="number" />
+                <InputNumber className="w-full" placeholder="Enter weight" type="number" />
               </Form.Item>
             </Col>
 
@@ -287,7 +288,7 @@ const MyKoi: React.FC = () => {
                   },
                 ]}
               >
-                <Input placeholder="Enter price" type="number" />
+                <InputNumber className="w-full" placeholder="Enter price" type="number" />
               </Form.Item>
             </Col>
             <Col span={12}>
